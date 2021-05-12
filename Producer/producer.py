@@ -17,7 +17,7 @@ def kafka_producer_news(producer):
     news = newsapi.get_top_headlines(country='in',page_size=70,language='en')
     if news['articles']!=[]:
         for article in news['articles']:
-            print(article+"\n")
+            print(article['title'])
             producer.send("newsapi",article)
 
 

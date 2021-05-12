@@ -1,12 +1,16 @@
 import tweepy 
 import time
+import json
 from kafka import KafkaProducer, KafkaConsumer
 
+file = open("../ApiCredentials.json",)
+api_keys = json.load(file)
+
 #twitter setup
-access_token = "1371406637362159622-ICkyarNJ3SuUAc0CVZb4PgtyQFUn2R"
-access_token_secret =  "UcFJuNmWXjzOyWb9GZfhFSPJZaDplqVZbgxVo45dFwtxe"
-consumer_key =  "FlIKebIx45zqbsMyBeBOuPlKT"
-consumer_secret =  "hW1TgjUJ7PYDZLg39mkjGWul9s8JiDskhOuh78vYXui1QpimBP"
+access_token = api_keys["access_token"]
+access_token_secret = api_keys["access_token_secret"]
+consumer_key =  api_keys["consumer_key"]
+consumer_secret = api_keys["consumer_secret"]
 
 #Creating the authentication object
 auth=tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -22,10 +26,11 @@ def normalize_timestamp(time):
     return (mytime.strftime("%Y-%m-%d %H:%M:%S"))
 
 producer=KafkaProducer(bootstrap_servers='localhost:9092')
-topic_name='trendingnews'
+topic_name='news'
 
 def get_twitter_data():
     res=api.search("covid")
+    print(res)
     for i in res:
         record=''
         record+=str(i)
@@ -42,5 +47,5 @@ def periodic_work(interval):
         get_twitter_data()
         time.sleep(interval)
 
-periodic_work(6)
+periodic_work(10)
 
