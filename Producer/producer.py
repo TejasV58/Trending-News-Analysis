@@ -18,6 +18,7 @@ def kafka_producer_news(producer):
     if news['articles']!=[]:
         for article in news['articles']:
             print(article['title'])
+            
             producer.send("newsapi",article)
 
 
