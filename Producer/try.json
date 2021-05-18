@@ -1,0 +1,758 @@
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Mon May 17 04:35:22 +0000 2021",
+    "entities": {
+        "hashtags": [
+            {
+                "indices": [
+                    8,
+                    10
+                ],
+                "text": "V"
+            }
+        ],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "twitter.com/i/web/status/1\u2026",
+                "expanded_url": "https://twitter.com/i/web/status/1394149520481480705",
+                "indices": [
+                    117,
+                    140
+                ],
+                "url": "https://t.co/rvNjjWO2fC"
+            }
+        ],
+        "user_mentions": []
+    },
+    "favorite_count": 0,
+    "favorited": false,
+    "geo": null,
+    "id": 1394149520481480705,
+    "id_str": "1394149520481480705",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+    },
+    "place": null,
+    "possibly_sensitive": false,
+    "retweet_count": 0,
+    "retweeted": false,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "text": "[Naver] #V shone in the recent Lotte concert for his overall performance and his visuals, and received enthusiastic\u2026 https://t.co/rvNjjWO2fC",
+    "truncated": true,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Sep 16 04:17:11 +0000 2019",
+        "default_profile": true,
+        "default_profile_image": false,
+        "description": "BTS V Fanbase since 2018.\n@VGlobalUNION Brand and Press Support for Kim Taehyung/ V of BTS. Turn Notifications on.",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "taehyungfunds.carrd.co",
+                        "expanded_url": "https://taehyungfunds.carrd.co/",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/rDnMqUhZ7u"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 25921,
+        "follow_request_sent": false,
+        "followers_count": 17244,
+        "following": false,
+        "friends_count": 257,
+        "geo_enabled": false,
+        "has_extended_profile": true,
+        "id": 1173450698488344577,
+        "id_str": "1173450698488344577",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 150,
+        "location": "Global",
+        "name": "The Taehyung Brand",
+        "notifications": false,
+        "profile_background_color": "F5F8FA",
+        "profile_background_image_url": null,
+        "profile_background_image_url_https": null,
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/1173450698488344577/1621133803",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1393774449229398017/lQVzOvDW_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1393774449229398017/lQVzOvDW_normal.jpg",
+        "profile_link_color": "1DA1F2",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "BTSV_Brand",
+        "statuses_count": 29033,
+        "time_zone": null,
+        "translator_type": "none",
+        "url": "https://t.co/rDnMqUhZ7u",
+        "utc_offset": null,
+        "verified": false,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Mon May 17 04:35:21 +0000 2021",
+    "entities": {
+        "hashtags": [
+            {
+                "indices": [
+                    31,
+                    37
+                ],
+                "text": "short"
+            },
+            {
+                "indices": [
+                    77,
+                    84
+                ],
+                "text": "market"
+            },
+            {
+                "indices": [
+                    85,
+                    94
+                ],
+                "text": "stalwart"
+            }
+        ],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": [
+            {
+                "id": 3159522210,
+                "id_str": "3159522210",
+                "indices": [
+                    3,
+                    19
+                ],
+                "name": "R Venkataraman",
+                "screen_name": "venkataraman_27"
+            },
+            {
+                "id": 2989553946,
+                "id_str": "2989553946",
+                "indices": [
+                    95,
+                    110
+                ],
+                "name": "Shankar Sharma",
+                "screen_name": "1shankarsharma"
+            }
+        ]
+    },
+    "favorite_count": 0,
+    "favorited": false,
+    "geo": null,
+    "id": 1394149518300508160,
+    "id_str": "1394149518300508160",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+    },
+    "place": null,
+    "possibly_sensitive": false,
+    "retweet_count": 2,
+    "retweeted": false,
+    "retweeted_status": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Mon May 17 04:34:40 +0000 2021",
+        "entities": {
+            "hashtags": [
+                {
+                    "indices": [
+                        10,
+                        16
+                    ],
+                    "text": "short"
+                },
+                {
+                    "indices": [
+                        56,
+                        63
+                    ],
+                    "text": "market"
+                },
+                {
+                    "indices": [
+                        64,
+                        73
+                    ],
+                    "text": "stalwart"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "twitter.com/i/web/status/1\u2026",
+                    "expanded_url": "https://twitter.com/i/web/status/1394149345700696067",
+                    "indices": [
+                        115,
+                        138
+                    ],
+                    "url": "https://t.co/cmQ0sElRU3"
+                }
+            ],
+            "user_mentions": [
+                {
+                    "id": 2989553946,
+                    "id_str": "2989553946",
+                    "indices": [
+                        74,
+                        89
+                    ],
+                    "name": "Shankar Sharma",
+                    "screen_name": "1shankarsharma"
+                }
+            ]
+        },
+        "favorite_count": 2,
+        "favorited": false,
+        "geo": null,
+        "id": 1394149345700696067,
+        "id_str": "1394149345700696067",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "metadata": {
+            "iso_language_code": "en",
+            "result_type": "recent"
+        },
+        "place": null,
+        "possibly_sensitive": false,
+        "retweet_count": 2,
+        "retweeted": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "text": "Here is a #short video from my recent conversation with #market #stalwart @1shankarsharma, where we discuss about\u2026 https://t.co/cmQ0sElRU3",
+        "truncated": true,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Thu Apr 16 12:25:47 +0000 2015",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Co-promoter and Managing Director, IIFL. My views on this platform are purely personal and the retweets are not endorsements.",
+            "entities": {
+                "description": {
+                    "urls": []
+                }
+            },
+            "favourites_count": 1795,
+            "follow_request_sent": false,
+            "followers_count": 2075,
+            "following": false,
+            "friends_count": 194,
+            "geo_enabled": false,
+            "has_extended_profile": false,
+            "id": 3159522210,
+            "id_str": "3159522210",
+            "is_translation_enabled": false,
+            "is_translator": false,
+            "lang": null,
+            "listed_count": 5,
+            "location": "Mumbai, India",
+            "name": "R Venkataraman",
+            "notifications": false,
+            "profile_background_color": "C0DEED",
+            "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_tile": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/3159522210/1592384171",
+            "profile_image_url": "http://pbs.twimg.com/profile_images/1120668961132036096/dPg9IasI_normal.png",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1120668961132036096/dPg9IasI_normal.png",
+            "profile_link_color": "1DA1F2",
+            "profile_sidebar_border_color": "C0DEED",
+            "profile_sidebar_fill_color": "DDEEF6",
+            "profile_text_color": "333333",
+            "profile_use_background_image": true,
+            "protected": false,
+            "screen_name": "venkataraman_27",
+            "statuses_count": 735,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": null,
+            "utc_offset": null,
+            "verified": true,
+            "withheld_in_countries": []
+        }
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "text": "RT @venkataraman_27: Here is a #short video from my recent conversation with #market #stalwart @1shankarsharma, where we discuss about #mid\u2026",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Fri Jan 24 09:33:32 +0000 2020",
+        "default_profile": true,
+        "default_profile_image": false,
+        "description": "IIFL Securities presents AAA tablet, India's foremost solution for independent financial advisors. You can run your office from a single tablet sitting anywhere",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "bit.ly/37rWHsY",
+                        "expanded_url": "https://bit.ly/37rWHsY",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/8x8gaTEvqY"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 599,
+        "follow_request_sent": false,
+        "followers_count": 305,
+        "following": false,
+        "friends_count": 107,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 1220640684471795714,
+        "id_str": "1220640684471795714",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 1,
+        "location": "India",
+        "name": "IIFLAAA - Advisor Anytime Anywhere",
+        "notifications": false,
+        "profile_background_color": "F5F8FA",
+        "profile_background_image_url": null,
+        "profile_background_image_url_https": null,
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/1220640684471795714/1579863554",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1221727501426151425/4hV6-Lmy_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1221727501426151425/4hV6-Lmy_normal.jpg",
+        "profile_link_color": "1DA1F2",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "iiflaaa",
+        "statuses_count": 531,
+        "time_zone": null,
+        "translator_type": "none",
+        "url": "https://t.co/8x8gaTEvqY",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Mon May 17 04:35:22 +0000 2021",
+    "entities": {
+        "hashtags": [
+            {
+                "indices": [
+                    8,
+                    10
+                ],
+                "text": "V"
+            }
+        ],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "twitter.com/i/web/status/1\u2026",
+                "expanded_url": "https://twitter.com/i/web/status/1394149520481480705",
+                "indices": [
+                    117,
+                    140
+                ],
+                "url": "https://t.co/rvNjjWO2fC"
+            }
+        ],
+        "user_mentions": []
+    },
+    "favorite_count": 0,
+    "favorited": false,
+    "geo": null,
+    "id": 1394149520481480705,
+    "id_str": "1394149520481480705",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+    },
+    "place": null,
+    "possibly_sensitive": false,
+    "retweet_count": 0,
+    "retweeted": false,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "text": "[Naver] #V shone in the recent Lotte concert for his overall performance and his visuals, and received enthusiastic\u2026 https://t.co/rvNjjWO2fC",
+    "truncated": true,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Sep 16 04:17:11 +0000 2019",
+        "default_profile": true,
+        "default_profile_image": false,
+        "description": "BTS V Fanbase since 2018.\n@VGlobalUNION Brand and Press Support for Kim Taehyung/ V of BTS. Turn Notifications on.",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "taehyungfunds.carrd.co",
+                        "expanded_url": "https://taehyungfunds.carrd.co/",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/rDnMqUhZ7u"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 25921,
+        "follow_request_sent": false,
+        "followers_count": 17244,
+        "following": false,
+        "friends_count": 257,
+        "geo_enabled": false,
+        "has_extended_profile": true,
+        "id": 1173450698488344577,
+        "id_str": "1173450698488344577",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 150,
+        "location": "Global",
+        "name": "The Taehyung Brand",
+        "notifications": false,
+        "profile_background_color": "F5F8FA",
+        "profile_background_image_url": null,
+        "profile_background_image_url_https": null,
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/1173450698488344577/1621133803",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1393774449229398017/lQVzOvDW_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1393774449229398017/lQVzOvDW_normal.jpg",
+        "profile_link_color": "1DA1F2",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "BTSV_Brand",
+        "statuses_count": 29033,
+        "time_zone": null,
+        "translator_type": "none",
+        "url": "https://t.co/rDnMqUhZ7u",
+        "utc_offset": null,
+        "verified": false,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Mon May 17 04:35:21 +0000 2021",
+    "entities": {
+        "hashtags": [
+            {
+                "indices": [
+                    31,
+                    37
+                ],
+                "text": "short"
+            },
+            {
+                "indices": [
+                    77,
+                    84
+                ],
+                "text": "market"
+            },
+            {
+                "indices": [
+                    85,
+                    94
+                ],
+                "text": "stalwart"
+            }
+        ],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": [
+            {
+                "id": 3159522210,
+                "id_str": "3159522210",
+                "indices": [
+                    3,
+                    19
+                ],
+                "name": "R Venkataraman",
+                "screen_name": "venkataraman_27"
+            },
+            {
+                "id": 2989553946,
+                "id_str": "2989553946",
+                "indices": [
+                    95,
+                    110
+                ],
+                "name": "Shankar Sharma",
+                "screen_name": "1shankarsharma"
+            }
+        ]
+    },
+    "favorite_count": 0,
+    "favorited": false,
+    "geo": null,
+    "id": 1394149518300508160,
+    "id_str": "1394149518300508160",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "metadata": {
+        "iso_language_code": "en",
+        "result_type": "recent"
+    },
+    "place": null,
+    "possibly_sensitive": false,
+    "retweet_count": 2,
+    "retweeted": false,
+    "retweeted_status": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Mon May 17 04:34:40 +0000 2021",
+        "entities": {
+            "hashtags": [
+                {
+                    "indices": [
+                        10,
+                        16
+                    ],
+                    "text": "short"
+                },
+                {
+                    "indices": [
+                        56,
+                        63
+                    ],
+                    "text": "market"
+                },
+                {
+                    "indices": [
+                        64,
+                        73
+                    ],
+                    "text": "stalwart"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "twitter.com/i/web/status/1\u2026",
+                    "expanded_url": "https://twitter.com/i/web/status/1394149345700696067",
+                    "indices": [
+                        115,
+                        138
+                    ],
+                    "url": "https://t.co/cmQ0sElRU3"
+                }
+            ],
+            "user_mentions": [
+                {
+                    "id": 2989553946,
+                    "id_str": "2989553946",
+                    "indices": [
+                        74,
+                        89
+                    ],
+                    "name": "Shankar Sharma",
+                    "screen_name": "1shankarsharma"
+                }
+            ]
+        },
+        "favorite_count": 2,
+        "favorited": false,
+        "geo": null,
+        "id": 1394149345700696067,
+        "id_str": "1394149345700696067",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "metadata": {
+            "iso_language_code": "en",
+            "result_type": "recent"
+        },
+        "place": null,
+        "possibly_sensitive": false,
+        "retweet_count": 2,
+        "retweeted": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "text": "Here is a #short video from my recent conversation with #market #stalwart @1shankarsharma, where we discuss about\u2026 https://t.co/cmQ0sElRU3",
+        "truncated": true,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Thu Apr 16 12:25:47 +0000 2015",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Co-promoter and Managing Director, IIFL. My views on this platform are purely personal and the retweets are not endorsements.",
+            "entities": {
+                "description": {
+                    "urls": []
+                }
+            },
+            "favourites_count": 1795,
+            "follow_request_sent": false,
+            "followers_count": 2075,
+            "following": false,
+            "friends_count": 194,
+            "geo_enabled": false,
+            "has_extended_profile": false,
+            "id": 3159522210,
+            "id_str": "3159522210",
+            "is_translation_enabled": false,
+            "is_translator": false,
+            "lang": null,
+            "listed_count": 5,
+            "location": "Mumbai, India",
+            "name": "R Venkataraman",
+            "notifications": false,
+            "profile_background_color": "C0DEED",
+            "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_tile": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/3159522210/1592384171",
+            "profile_image_url": "http://pbs.twimg.com/profile_images/1120668961132036096/dPg9IasI_normal.png",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1120668961132036096/dPg9IasI_normal.png",
+            "profile_link_color": "1DA1F2",
+            "profile_sidebar_border_color": "C0DEED",
+            "profile_sidebar_fill_color": "DDEEF6",
+            "profile_text_color": "333333",
+            "profile_use_background_image": true,
+            "protected": false,
+            "screen_name": "venkataraman_27",
+            "statuses_count": 735,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": null,
+            "utc_offset": null,
+            "verified": true,
+            "withheld_in_countries": []
+        }
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "text": "RT @venkataraman_27: Here is a #short video from my recent conversation with #market #stalwart @1shankarsharma, where we discuss about #mid\u2026",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Fri Jan 24 09:33:32 +0000 2020",
+        "default_profile": true,
+        "default_profile_image": false,
+        "description": "IIFL Securities presents AAA tablet, India's foremost solution for independent financial advisors. You can run your office from a single tablet sitting anywhere",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "bit.ly/37rWHsY",
+                        "expanded_url": "https://bit.ly/37rWHsY",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/8x8gaTEvqY"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 599,
+        "follow_request_sent": false,
+        "followers_count": 305,
+        "following": false,
+        "friends_count": 107,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 1220640684471795714,
+        "id_str": "1220640684471795714",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 1,
+        "location": "India",
+        "name": "IIFLAAA - Advisor Anytime Anywhere",
+        "notifications": false,
+        "profile_background_color": "F5F8FA",
+        "profile_background_image_url": null,
+        "profile_background_image_url_https": null,
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/1220640684471795714/1579863554",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1221727501426151425/4hV6-Lmy_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1221727501426151425/4hV6-Lmy_normal.jpg",
+        "profile_link_color": "1DA1F2",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "iiflaaa",
+        "statuses_count": 531,
+        "time_zone": null,
+        "translator_type": "none",
+        "url": "https://t.co/8x8gaTEvqY",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}

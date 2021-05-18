@@ -26,19 +26,30 @@ def normalize_timestamp(time):
     return (mytime.strftime("%Y-%m-%d %H:%M:%S"))
 
 producer=KafkaProducer(bootstrap_servers='localhost:9092')
-topic_name='news'
+topic_name='cyclone'
 
 def get_twitter_data():
-    res=api.search("covid")
-    print(res)
-    for i in res:
+    tweets = tweepy.Cursor(api.search,
+              q=topic_name,
+              tweet_mode = 'extended',
+              lang="en").items(1)
+    for tweet in tweets:
         record=''
-        record+=str(i)
+        record+=str(tweet.full_text +"\t"+ str(tweet.retweet_count))
         record+=';'
-        producer.send(topic_name,str.encode(record))
         print(record)
-        print("\n\n")
-        producer.flush() 
+        producer.send(topic_name,str.encode(record))
+        producer.flush()
+    # res=api.search("news")
+    # for i in res:
+    #     json_str = json.dumps(i._json)
+    #     parsed = json.loads(json_str)
+    #     record=''
+    #     record+=str(i.text +"\t"+ str(i.retweet_count))
+    #     record+=';'
+    #     print(record)
+    #     producer.send(topic_name,str.encode(record))
+    #     producer.flush() 
 
 get_twitter_data()
 
@@ -47,5 +58,4 @@ def periodic_work(interval):
         get_twitter_data()
         time.sleep(interval)
 
-periodic_work(10)
-
+periodic_work(5)
