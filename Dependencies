@@ -1,6 +1,20 @@
-# Spark
-- findspark
-- pyspark
+# python = 3.7 
+    refer this to change the version -> https://www.itsupportwale.com/blog/how-to-upgrade-to-python-3-7-on-ubuntu-18-10/
+
+#Kafka
+- pip3 install kafka-python
+- pip3 install kafka
+
+# Spark = version 2.4.7
+
+in ~/.bashrc add -> 
+export SPARK_HOME=/opt/spark
+export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+then run command in terminal ->
+source ~/.bashrc
+
+- pip3 install findspark
+- pip3 install pyspark
 
 # newsapi
-- newsapi-python
+- pip3 install newsapi-python
