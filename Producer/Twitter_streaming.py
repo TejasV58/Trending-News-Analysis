@@ -25,8 +25,11 @@ def normalize_timestamp(time):
     mytime=datetime.strptime(time,"%Y-%m-%d %H:%M:%S")
     return (mytime.strftime("%Y-%m-%d %H:%M:%S"))
 
-producer=KafkaProducer(bootstrap_servers='localhost:9092')
-topic_name='cyclone'
+def json_serializer(data):
+    return json.dumps(data).encode("utf-8")  
+
+producer=KafkaProducer(bootstrap_servers='localhost:9092',value_serializer=json_serializer)
+topic_name='news'
 
 def get_twitter_data():
     tweets = tweepy.Cursor(api.search,
@@ -34,11 +37,11 @@ def get_twitter_data():
               tweet_mode = 'extended',
               lang="en").items(1)
     for tweet in tweets:
-        record=''
-        record+=str(tweet.full_text +"\t"+ str(tweet.retweet_count))
-        record+=';'
+        record={}
+        record['text']=str(tweet.full_text) 
+        record['retweet_count'] = tweet.retweet_count
         print(record)
-        producer.send(topic_name,str.encode(record))
+        producer.send(topic_name,record)
         producer.flush()
     # res=api.search("news")
     # for i in res:
