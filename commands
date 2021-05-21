@@ -1,0 +1,20 @@
+# KAFKA
+-------------------------------------------------------------------
+Start zookeeper using : 
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+Start Kafka using :
+JMX_PORT=8004 bin/kafka-server-start.sh config/server.properties
+-------------------------------------------------------------------
+
+# CMAK
+-------------------------------------------------------------------
+Start the kafka manger server using:
+bin/cmak -Dconfig.file=conf/application.conf -Dhttp.port=8080
+-------------------------------------------------------------------
+
+# SPARK
+-------------------------------------------------------------------
+spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.0.2 trial.py
+-------------------------------------------------------------------
+
