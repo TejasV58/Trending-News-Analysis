@@ -15,6 +15,6 @@ bin/cmak -Dconfig.file=conf/application.conf -Dhttp.port=8080
 
 # SPARK
 -------------------------------------------------------------------
-spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.0.2 trial.py
+spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.0.2 kafka_spark.py
 -------------------------------------------------------------------
 
