@@ -34,9 +34,7 @@ trend_=[]
 for value in trends:
     for trend in value['trends']:
         trend_.append(trend['name'])
-
-print(trend_)
-
+        
 def get_twitter_data():
     for trend in trend_:
         tweets = tweepy.Cursor(api.search,
