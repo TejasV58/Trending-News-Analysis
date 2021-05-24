@@ -22,6 +22,8 @@ api=tweepy.API(auth)
 from datetime import datetime
 
 def json_serializer(data):
+    print(json.dumps(data))
+    print('\n')
     return json.dumps(data).encode("utf-8")  
 
 producer=KafkaProducer(bootstrap_servers='localhost:9092',value_serializer=json_serializer)
@@ -52,8 +54,7 @@ def get_twitter_data():
                 record['text']=str(tweet.full_text)
                 record['retweets']=str(tweet.retweet_count)
                 record['favorites']=str(tweet.favorite_count)
-            print(record)
-            print('\n')
+
             producer.send(topic_name,record)
             producer.flush()
 
