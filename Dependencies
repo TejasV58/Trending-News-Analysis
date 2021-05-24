@@ -18,3 +18,7 @@ source ~/.bashrc
 
 # newsapi
 - pip3 install newsapi-python
+
+#inshorts
+- beautifulsoup4==4.6.0
+- lxml==4.1.1
