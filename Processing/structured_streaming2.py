@@ -12,7 +12,7 @@ kafka_bootstrap_servers = 'localhost:9092'
 
 if __name__ == "__main__":
     print("Stream Data Processing Application Started ...\n")
-    spark = SparkSession.builder.appName("PySpark Structured Streaming with Kafka Demo").master("local[*]").config("spark.jars","/home/sanika/Documents/spark-sql-kafka-0-10_2.11-2.4.0.jar","/home/sanika/Documents/kafka-clients-1.1.0.jar").config("spark.executor.extraClassPath","/home/sanika/Documents/spark-sql-kafka-0-10_2.11-2.4.0.jar","/home/sanika/Documents/kafka-clients-1.1.0.jar").config("spark.executor.extraLibrary","/home/sanika/Documents/spark-sql-kafka-0-10_2.11-2.4.0.jar","/home/sanika/Documents/kafka-clients-1.1.0.jar").config("spark.driver.extraClassPath","/home/sanika/Documents/spark-sql-kafka-0-10_2.11-2.4.0.jar","/home/sanika/Documents/kafka-clients-1.1.0.jar").getOrCreate()
+    spark = SparkSession.builder.appName("PySpark Structured Streaming with Kafka Demo").master("local").getOrCreate()
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
     spark.sparkContext.setLogLevel("ERROR")
@@ -32,9 +32,7 @@ if __name__ == "__main__":
         .add("retweets", StringType()) \
         .add("favorites", StringType())
 
-    twitter_df2 = twitter_df1\
-        .select(from_json(col("value"), twitter_schema)\
-        .alias("twitter_columns"), "timestamp")
+    twitter_df2 = twitter_df1.select(from_json(col("value"), twitter_schema).alias("twitter_columns"), "timestamp")
 
     twitter_df3 = twitter_df2.select("twitter_columns.*", "timestamp")
     print("Printing Schema of twitter_df3: ")
@@ -59,5 +57,8 @@ if __name__ == "__main__":
     #     .start()
 
     # twitter_agg_write_stream.awaitTermination()
+    query = twitter_df3.writeStream.trigger(processingTime='5 seconds').outputMode("update").option("truncate", "true").format("console").start()
+    query.awaitTermination()
 
     print("Stream Data Processing Application Completed.")
+    

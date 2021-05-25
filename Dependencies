@@ -2,8 +2,8 @@
     refer this to change the version -> https://www.itsupportwale.com/blog/how-to-upgrade-to-python-3-7-on-ubuntu-18-10/
 
 #Kafka
-- pip3 install kafka-python
 - pip3 install kafka
+- pip3 install kafka-python (install kafka before kafka-python)
 
 # Spark = version 2.4.7
 
