@@ -15,6 +15,7 @@ source ~/.bashrc
 
 - pip3 install findspark
 - pip3 install pyspark
+- pip3 install textblob
 
 # newsapi
 - pip3 install newsapi-python
