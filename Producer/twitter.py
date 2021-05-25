@@ -22,8 +22,6 @@ api=tweepy.API(auth)
 from datetime import datetime
 
 def json_serializer(data):
-    print(json.dumps(data))
-    print('\n')
     return json.dumps(data).encode("utf-8")  
 
 producer=KafkaProducer(bootstrap_servers='localhost:9092',value_serializer=json_serializer)
@@ -45,14 +43,15 @@ def get_twitter_data():
             record={}
             record['id']=str(tweet.id)
             if 'retweeted_status' in tweet._json:
-                record['text']=str(tweet._json['retweeted_status']['full_text'])
-                record['retweets']=str(tweet.retweet_count)
-                record['favorites']=str(tweet._json['retweeted_status']['favorite_count'])
+                record['text']=str(tweet._json['retweeted_status']['full_text']).lower()
+                record['score']=int(tweet.retweet_count)*2
+                record['score']+=int(tweet._json['retweeted_status']['favorite_count'])
             else:
-                record['text']=str(tweet.full_text)
-                record['retweets']=str(tweet.retweet_count)
-                record['favorites']=str(tweet.favorite_count)
-
+                record['text']=str(tweet.full_text).lower()
+                record['score']=int(tweet.retweet_count)*2
+                record['score']+=int(tweet.favorite_count)
+            print(record)
+            print('\n')
             producer.send(topic_name,record)
             producer.flush()
 
