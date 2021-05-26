@@ -22,7 +22,8 @@ def get_newsapi_news():
     if news['articles']!=[]:
         for article in news['articles']:
             newsObject = {
-                'title': article["title"]
+                'id':article["publishedAt"],
+                'text': article["title"]
             }
             print(newsObject)
             print('\n')
