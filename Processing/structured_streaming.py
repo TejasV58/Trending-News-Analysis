@@ -72,7 +72,7 @@ if __name__ == "__main__":
     spark.sparkContext.setLogLevel("ERROR")
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
-    #################  TF-IDF PIPELINE  ###################
+    ############################  TF-IDF PIPELINE  ###############################
 
     hashingTF = HashingTF(inputCol="text", outputCol="tf")
     idf = IDF(inputCol="tf", outputCol="feature")
@@ -102,7 +102,8 @@ if __name__ == "__main__":
     headlines_df2 = headlines_df1\
         .select(from_json(col("value"), headlines_schema)
         .alias("headlines_columns"))
-    headlines_final_df = headlines_df2.select("headlines_columns.*")
+    headlines_df3 = headlines_df2.select("headlines_columns.*")
+    headlines_df4 = headlines_df3.withColumn("score",lit(100))
 
     ###################  Construct a streaming DataFrame for twitter  #########################
 
@@ -130,34 +131,36 @@ if __name__ == "__main__":
 
     twitter_final_df = preprocessing(twitter_df3)
 
+    #twitter_headlines_df = twitter_final_df.union(df_2)
     df = twitter_final_df.withColumn("text", F.split("text", ' '))
     twitter_tfidf = light_pipeline.transform(df)
 
     #if len(twitter_tfidf.count()) != 0:
-    '''similarities = find_similarity(twitter_tfidf,spark)
+    # similarities = find_similarity(twitter_tfidf,spark)
 
-    query_tweets = similarities.writeStream\
-        .trigger(processingTime='5 seconds')\
-        .outputMode("append")\
-        .option("truncate", "true")\
-        .format("console")\
-        .start()'''
+    # query_tweets = similarities.writeStream\
+    #     .trigger(processingTime='5 seconds')\
+    #     .outputMode("append")\
+    #     .option("truncate", "true")\
+    #     .format("console")\
+    #     .start()
     
     #################### Write final result into console for debugging purpose  ##########################
     
-    query_headlines = headlines_final_df\
-        .writeStream.trigger(processingTime='10 seconds')\
+    query_headlines = headlines_df4\
+        .writeStream.trigger(processingTime='5 seconds')\
         .outputMode("update")\
         .option("truncate", "false")\
         .format("console")\
         .start()
         
-    query_tweets = twitter_final_df.writeStream\
+    query_tweets = twitter_tfidf.writeStream\
         .trigger(processingTime='5 seconds')\
         .outputMode("update")\
-        .option("truncate", "false")\
+        .option("truncate", "true")\
         .format("console")\
         .start()    
+
 
     
 
