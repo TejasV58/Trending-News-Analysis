@@ -13,19 +13,26 @@ def json_serializer(data):
 
 topic_name='headlines'
 
-def kafka_producer_news(producer):
+producer = KafkaProducer(bootstrap_servers=['localhost:9092'],value_serializer=json_serializer)
+
+def get_newsapi_news():
     api = api_keys["newsapikey"]
     newsapi = NewsApiClient(api_key=api)
-    news = newsapi.get_top_headlines(country='in',page_size=70,language='en')
+    news = newsapi.get_top_headlines(country='in',page_size=10,language='en')
     if news['articles']!=[]:
         for article in news['articles']:
             newsObject = {
                 'title': article["title"]
             }
+            print(newsObject)
+            print('\n')
             producer.send(topic_name,newsObject)
+            producer.flush()
 
-
-if __name__ == "__main__":
-    producer = KafkaProducer(bootstrap_servers=['localhost:9092'],value_serializer=json_serializer)
-    kafka_producer_news(producer)
     
+def periodic_work(interval):
+    while True: 
+        get_newsapi_news()
+        time.sleep(interval)
+
+periodic_work(1800)

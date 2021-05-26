@@ -1,11 +1,11 @@
-import time
 import findspark
 findspark.init('/opt/spark')
 
-from pyspark.sql import functions as F
-from pyspark.sql.types import *
-from pyspark.sql.functions import *
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+from pyspark.sql.types import *
+from pyspark.sql import functions as F
+import time
 
 from pyspark.ml import Pipeline
 from pyspark.sql import SparkSession
@@ -21,11 +21,9 @@ from pyspark.ml.feature import HashingTF, IDF
 from pyspark.ml.feature import Normalizer
 from pyspark.mllib.linalg.distributed import IndexedRow, IndexedRowMatrix
 
-MODEL_NAME = "tfhub_use"
 
 kafka_topic_name = "twitter"
 kafka_bootstrap_servers = 'localhost:9092'
-
 
 def preprocessing(tweets):
     tweets = tweets.select(col("id"),explode(split(tweets.text, "t_end")).alias("text"), col("score"))
@@ -39,11 +37,10 @@ def preprocessing(tweets):
     tweets = tweets.withColumn('text', F.regexp_replace('text', '[.!?\\-]', ' '))
     tweets = tweets.withColumn('text', F.regexp_replace('text', "[^ 'a-zA-Z0-9]", ''))
 
-    stopwords = ["ourselves", "her", "between", "yourself", "but", "again", "there", "about", "once", "during", "out", "very", "having", "with", "they", "own", "an", "be", "some", "for", "do", "its", "yours", "such", "into", "of", "most", "itself", "other", "off", "is", "am", "or", "who", "as", "from", "him", "each", "the", "themselves", "until", "below", "are", "we", "these", "your", "his", "through", "don", "nor", "me", "were", "her", "more", "himself", "this", "down", "should", "our", "their", "while","above", "both", "up", "to", "ours", "had", "she", "all", "no", "when", "at", "any", "before", "them", "same", "and", "been", "have", "in", "will", "on", "does", "yourselves", "then", "that", "because", "what", "over", "why", "so", "can", "did", "not", "now", "under", "he", "you", "herself", "has", "just", "where", "too", "only", "myself", "which", "those", "i", "after", "few", "whom", "being", "if", "theirs", "my", "against", "a", "by", "doing", "it", "how", "further", "was", "here", "than"]
-
+    stopwords = ["ourselves", "her", "between", "yourself", "but", "again", "there", "about", "once", "during", "out", "very", "having", "with", "they", "own", "an", "be", "some", "for", "do", "its", "yours", "such", "into", "of", "most", "itself", "other", "off", "is", "am", "or", "who", "as", "from", "him", "each", "the", "themselves", "until", "below", "are", "we", "these", "your", "his", "through", "don", "nor", "me", "were", "her", "more", "himself", "this", "down", "should", "our", "their", "while", "above", "both", "up", "to", "ours", "had", "she", "all", "no", "when", "at", "any", "before", "them", "same", "and", "been", "have", "in", "will", "on", "does", "yourselves", "then", "that", "because", "what", "over", "why", "so", "can", "did", "not", "now", "under", "he", "you", "herself", "has", "just", "where", "too", "only", "myself", "which", "those", "i", "after", "few", "whom", "being", "if", "theirs", "my", "against", "a", "by", "doing", "it", "how", "further", "was", "here", "than"]
+    
     for stopword in stopwords:
-        tweets = tweets.withColumn(
-            'text', F.regexp_replace('text', ' '+stopword+' ', ' '))
+        tweets = tweets.withColumn('text', F.regexp_replace('text', ' '+stopword+' ' , ' '))
     tweets = tweets.withColumn('text', F.regexp_replace('text', ' +', ' '))
     tweets.select(trim(col("text")))
     return tweets
@@ -58,19 +55,22 @@ def find_similarity(data,spark):
     return data
 
 
+    
 if __name__ == "__main__":
+    print("Stream Data Processing Application Started ...\n")
+    spark = SparkSession.builder.appName("PySpark Structured Streaming with Kafka").master("local[*]").getOrCreate()
+    print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
     print("\n\n=====================================================================")
     print("Stream Data Processing Application Started.....")
     print("=====================================================================\n\n")
-
-    spark = SparkSession.builder\
-        .appName("PySpark Structured Streaming with Kafka")\
-        .master("local[*]")\
-        .getOrCreate()
-
     spark.sparkContext.setLogLevel("ERROR")
-    print(time.strftime("%Y-%m-%d %H:%M:%S"))
+
+     # Construct a streaming DataFrame that reads from headlines from newsapi, websearch api and inshorts
+
+    headlines_df = spark.readStream.format("kafka").option("kafka.bootstrap.servers", kafka_bootstrap_servers).option("subscribe", "headlines").option("startingOffsets", "latest").load()
+    
+    headlines_df1 = headlines_df.selectExpr("CAST(value AS STRING)")
 
     ############################  TF-IDF PIPELINE  ###############################
 
@@ -90,12 +90,9 @@ if __name__ == "__main__":
 
     ##############  streaming DataFrame for headlines from newsapi, websearch api and inshorts  #############
 
-    headlines_df = spark\
-        .readStream.format("kafka")\
-        .option("kafka.bootstrap.servers", kafka_bootstrap_servers)\
-        .option("subscribe", "headlines")\
-        .option("startingOffsets", "latest")\
-        .load()
+    headlines_schema = StructType().add("title", StringType())
+
+    headlines_df2 = headlines_df1.select(from_json(col("value"), headlines_schema).alias("headlines_columns"))
 
     headlines_df1 = headlines_df.selectExpr("CAST(value AS STRING)")
     headlines_schema = StructType().add("title", StringType())      # Define a schema for headlines
@@ -107,28 +104,17 @@ if __name__ == "__main__":
 
     ###################  Construct a streaming DataFrame for twitter  #########################
 
-    twitter_df = spark.readStream\
-        .format("kafka")\
-        .option("kafka.bootstrap.servers", kafka_bootstrap_servers)\
-        .option("subscribe", "twitter")\
-        .option("startingOffsets", "latest")\
-        .load()
+    twitter_df = spark.readStream.format("kafka").option("kafka.bootstrap.servers", kafka_bootstrap_servers).option("subscribe", "twitter").option("startingOffsets", "latest").load()
 
     twitter_df1 = twitter_df.selectExpr("CAST(value AS STRING)")
 
     ################# Define a schema for twitter  #############################
 
-    twitter_schema = StructType()\
-        .add("id", StringType())\
-        .add("text", StringType())\
-        .add("score", IntegerType())
+    twitter_schema = StructType().add("id", StringType()).add("text", StringType()).add("score", IntegerType())
 
-    twitter_df2 = twitter_df1\
-        .select(from_json(col("value"), twitter_schema)\
-        .alias("twitter_columns"))
+    twitter_df2 = twitter_df1.select(from_json(col("value"), twitter_schema).alias("twitter_columns"))
 
     twitter_df3 = twitter_df2.select("twitter_columns.*")
-
     twitter_final_df = preprocessing(twitter_df3)
 
     #twitter_headlines_df = twitter_final_df.union(df_2)
@@ -166,6 +152,4 @@ if __name__ == "__main__":
 
     spark.streams.awaitAnyTermination()
 
-    print("\n\n=====================================================================")
     print("Stream Data Processing Application Completed.")
-    print("=====================================================================\n\n")
