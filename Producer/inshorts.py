@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import json
+import time
 from kafka import KafkaProducer, KafkaConsumer
 
 topic_name='headlines'
@@ -11,7 +12,7 @@ def json_serializer(data):
 
 producer=KafkaProducer(bootstrap_servers='localhost:9092',value_serializer=json_serializer)
 
-def getNews(category):
+def get_inshorts_news(category):
     newsDictionary = []
     try:
         htmlBody = requests.get('https://www.inshorts.com/en/read/' + category)
@@ -26,7 +27,6 @@ def getNews(category):
         newsDictionary['success'] = False
         newsDictionary['errorMessage'] = 'Invalid Category'
         return newsDictionary
-    
     for card in newsCards:
         try:
             title = card.find(class_='news-card-title').find('a').text
@@ -46,7 +46,7 @@ def getNews(category):
             time = card.find(class_='time').text
         except AttributeError:
             time = None
-  
+
         newsObject = {
             'title': title
         }
@@ -54,9 +54,14 @@ def getNews(category):
         print('\n')
         producer.send(topic_name,newsObject)
         producer.flush()
+       
 
 categories=["national","business","sports","world","politics","technology","startup","entertainment","miscellaneous","hatke","science","automobile"]
 
-for category in categories:
-    news=getNews(category)
-    print(news)
+def periodic_work(interval):
+    while True: 
+        for category in categories:
+            get_inshorts_news(category)
+        time.sleep(interval)
+
+periodic_work(1800)

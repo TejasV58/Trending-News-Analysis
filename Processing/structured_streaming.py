@@ -29,6 +29,30 @@ def preprocessing(tweets):
     tweets = tweets.withColumn('text', F.regexp_replace('text', ' +', ' '))
     tweets.select(trim(col("text")))
     return tweets
+def get_similarity(df):
+
+    df = df.withColumn("word", F.split("word", ' '))
+    hashingTF = HashingTF(inputCol="word", outputCol="tf")
+    tf = hashingTF.transform(df)
+    
+    idf = IDF(inputCol="tf", outputCol="feature")
+    modelidf = idf.fit(tf)
+    tfidf = modelidf.transform(tf)
+
+    normalizer = Normalizer(inputCol="feature", outputCol="norm")
+    data = normalizer.transform(tfidf)
+    
+    mat = IndexedRowMatrix(
+    data.select("ID", "norm")\
+        .rdd.map(lambda row: IndexedRow(row.ID, row.norm.toArray()))).toBlockMatrix()
+    dot = mat.multiply(mat.transpose())
+    dot.toLocalMatrix().toArray()
+    collected = df.select('word').toPandas()
+    list_headlines = list(collected['word'])
+    df = pd.DataFrame(dot, columns=list_headlines)
+    sdf = spark.createDataFrame(df)
+    return sdf
+
     
 if __name__ == "__main__":
     print("Stream Data Processing Application Started ...\n")
@@ -70,10 +94,10 @@ if __name__ == "__main__":
 
     # Write final result into console for debugging purpose
 
-    query_headlines = headlines_final_df.writeStream.trigger(processingTime='10 seconds').outputMode("update").option("truncate", "false").format("console").start()
-    query_headlines.awaitTermination()
+    query_headlines = headlines_final_df.writeStream.trigger(processingTime='10 seconds').outputMode("update").option("truncate", "true").format("console").start()
 
-    query_tweets = twitter_final_df.writeStream.trigger(processingTime='10 seconds').outputMode("update").option("truncate", "false").format("console").start()
-    query_tweets.awaitTermination()
+    query_tweets = twitter_final_df.writeStream.trigger(processingTime='5 seconds').outputMode("update").option("truncate", "true").format("console").start()
+    
+    spark.streams.awaitAnyTermination()
 
     print("Stream Data Processing Application Completed.")
