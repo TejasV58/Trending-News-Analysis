@@ -1,7 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 import datetime
+import json
+from kafka import KafkaProducer, KafkaConsumer
 
+topic_name='headlines'
+
+def json_serializer(data):
+    return json.dumps(data).encode("utf-8")
+
+producer=KafkaProducer(bootstrap_servers='localhost:9092',value_serializer=json_serializer)
 
 def getNews(category):
     newsDictionary = []
@@ -44,8 +52,11 @@ def getNews(category):
         }
         print(newsObject)
         print('\n')
+        producer.send(topic_name,newsObject)
+        producer.flush()
 
 categories=["national","business","sports","world","politics","technology","startup","entertainment","miscellaneous","hatke","science","automobile"]
+
 for category in categories:
     news=getNews(category)
     print(news)

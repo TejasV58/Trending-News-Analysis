@@ -1,21 +1,24 @@
 # KAFKA
 -------------------------------------------------------------------
-Start zookeeper using : 
+Start zookeeper using :
+/opt/kafka_2.13-2.7.0 
 bin/zookeeper-server-start.sh config/zookeeper.properties
 
 Start Kafka using :
+/opt/kafka_2.13-2.7.0
 JMX_PORT=8004 bin/kafka-server-start.sh config/server.properties
 -------------------------------------------------------------------
 
 # CMAK
 -------------------------------------------------------------------
 Start the kafka manger server using:
+/opt/CMAK/target/universal/cmak-3.0.0.5
 bin/cmak -Dconfig.file=conf/application.conf -Dhttp.port=8080
 -------------------------------------------------------------------
 
 # SPARK
 -------------------------------------------------------------------
 spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.0.2 kafka_spark.py
-spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.1 structured_streaming2.py
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.1 structured_streaming.py
 -------------------------------------------------------------------
 

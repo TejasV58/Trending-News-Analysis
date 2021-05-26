@@ -9,7 +9,9 @@ file = open("../ApiCredentials.json",)
 api_keys = json.load(file)
 
 def json_serializer(data):
-    return json.dumps(data).encode("utf-8")  
+    return json.dumps(data).encode("utf-8") 
+
+topic_name='headlines'
 
 def kafka_producer_news(producer):
     api = api_keys["newsapikey"]
@@ -17,9 +19,10 @@ def kafka_producer_news(producer):
     news = newsapi.get_top_headlines(country='in',page_size=70,language='en')
     if news['articles']!=[]:
         for article in news['articles']:
-            print(article['title'])
-            print("\n\n")
-            # producer.send("newsapi",article)
+            newsObject = {
+                'title': article["title"]
+            }
+            producer.send(topic_name,newsObject)
 
 
 if __name__ == "__main__":
