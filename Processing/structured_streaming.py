@@ -7,19 +7,31 @@ from pyspark.sql.types import *
 from pyspark.sql.functions import *
 from pyspark.sql import SparkSession
 
-#MODEL_NAME = "tfhub_use"
+from pyspark.ml import Pipeline
+from pyspark.sql import SparkSession
+import pyspark.sql.functions as F
+from pyspark.sql.functions import expr
+
+import sparknlp
+from sparknlp.annotator import *
+from sparknlp.base import *
+from sparknlp.pretrained import PretrainedPipeline
+
+from pyspark.ml.feature import HashingTF, IDF
+from pyspark.ml.feature import Normalizer
+from pyspark.mllib.linalg.distributed import IndexedRow, IndexedRowMatrix
+
+MODEL_NAME = "tfhub_use"
 
 kafka_topic_name = "twitter"
 kafka_bootstrap_servers = 'localhost:9092'
 
 
 def preprocessing(tweets):
-    tweets = tweets.select(
-        explode(split(tweets.text, "t_end")).alias("text"), col("score"))
+    tweets = tweets.select(col("id"),explode(split(tweets.text, "t_end")).alias("text"), col("score"))
     tweets = tweets.na.replace('', None)
     tweets = tweets.na.drop()
-    tweets = tweets.withColumn(
-        'text', F.regexp_replace('text', r'http\S+', ''))
+    tweets = tweets.withColumn('text', F.regexp_replace('text', r'http\S+', ''))
     tweets = tweets.withColumn('text', F.regexp_replace('text', '@\w+', ''))
     tweets = tweets.withColumn('text', F.regexp_replace('text', '#', ''))
     tweets = tweets.withColumn('text', F.regexp_replace('text', 'RT', ''))
@@ -36,11 +48,20 @@ def preprocessing(tweets):
     tweets.select(trim(col("text")))
     return tweets
 
+def find_similarity(data,spark):
+    dot_udf = F.udf(lambda x,y: float(x.dot(y)), DoubleType())
+    data = data.alias("i").join(data.alias("j"), expr(F.col("i.ID") < F.col("j.ID")))\
+    .select(
+        F.col("i.ID").alias("i"), 
+        F.col("j.ID").alias("j"), 
+        dot_udf("i.norm", "j.norm").alias("dot"))
+    return data
+
 
 if __name__ == "__main__":
 
     print("\n\n=====================================================================")
-    print("\n\nStream Data Processing Application Started.....")
+    print("Stream Data Processing Application Started.....")
     print("=====================================================================\n\n")
 
     spark = SparkSession.builder\
@@ -51,7 +72,23 @@ if __name__ == "__main__":
     spark.sparkContext.setLogLevel("ERROR")
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
-    # Construct a streaming DataFrame that reads from headlines from newsapi, websearch api and inshorts
+    #################  TF-IDF PIPELINE  ###################
+
+    hashingTF = HashingTF(inputCol="text", outputCol="tf")
+    idf = IDF(inputCol="tf", outputCol="feature")
+    normalizer = Normalizer(inputCol="feature", outputCol="norm")
+
+    nlp_pipeline = Pipeline(stages=[
+        hashingTF, 
+        idf,
+        normalizer
+    ])
+    
+    empty_df = spark.createDataFrame([[['']]]).toDF('text')
+    pipeline_model = nlp_pipeline.fit(empty_df)
+    light_pipeline = LightPipeline(pipeline_model)
+
+    ##############  streaming DataFrame for headlines from newsapi, websearch api and inshorts  #############
 
     headlines_df = spark\
         .readStream.format("kafka")\
@@ -67,7 +104,7 @@ if __name__ == "__main__":
         .alias("headlines_columns"))
     headlines_final_df = headlines_df2.select("headlines_columns.*")
 
-    # Construct a streaming DataFrame that reads from twitter
+    ###################  Construct a streaming DataFrame for twitter  #########################
 
     twitter_df = spark.readStream\
         .format("kafka")\
@@ -78,7 +115,7 @@ if __name__ == "__main__":
 
     twitter_df1 = twitter_df.selectExpr("CAST(value AS STRING)")
 
-    # Define a schema for twitter
+    ################# Define a schema for twitter  #############################
 
     twitter_schema = StructType()\
         .add("id", StringType())\
@@ -90,19 +127,40 @@ if __name__ == "__main__":
         .alias("twitter_columns"))
 
     twitter_df3 = twitter_df2.select("twitter_columns.*")
+
     twitter_final_df = preprocessing(twitter_df3)
 
-    # Write final result into console for debugging purpose
+    df = twitter_final_df.withColumn("text", F.split("text", ' '))
+    twitter_tfidf = light_pipeline.transform(df)
 
+    #if len(twitter_tfidf.count()) != 0:
+    '''similarities = find_similarity(twitter_tfidf,spark)
+
+    query_tweets = similarities.writeStream\
+        .trigger(processingTime='5 seconds')\
+        .outputMode("append")\
+        .option("truncate", "true")\
+        .format("console")\
+        .start()'''
+    
+    #################### Write final result into console for debugging purpose  ##########################
+    
     query_headlines = headlines_final_df\
         .writeStream.trigger(processingTime='10 seconds')\
         .outputMode("update")\
         .option("truncate", "false")\
         .format("console")\
         .start()
-    query_tweets = twitter_final_df.writeStream.trigger(processingTime='10 seconds').outputMode(
-        "update").option("truncate", "false").format("console").start()
+        
+    query_tweets = twitter_final_df.writeStream\
+        .trigger(processingTime='5 seconds')\
+        .outputMode("update")\
+        .option("truncate", "false")\
+        .format("console")\
+        .start()    
+
     
+
     spark.streams.awaitAnyTermination()
 
     print("\n\n=====================================================================")

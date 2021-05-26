@@ -3,14 +3,6 @@ import os
 import pandas as pd
 import numpy as np
 
-from pyspark.ml import Pipeline
-from pyspark.sql import SparkSession
-import pyspark.sql.functions as F
-
-import sparknlp
-from sparknlp.annotator import *
-from sparknlp.base import *
-from sparknlp.pretrained import PretrainedPipeline
 
 spark = sparknlp.start()
 
