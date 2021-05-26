@@ -29,12 +29,11 @@ def preprocessing(tweets):
     tweets = tweets.withColumn('text', F.regexp_replace('text', ' +', ' '))
     tweets.select(trim(col("text")))
     return tweets
-def get_similarity(df):
 
+def get_similarity(df):
     df = df.withColumn("word", F.split("word", ' '))
     hashingTF = HashingTF(inputCol="word", outputCol="tf")
     tf = hashingTF.transform(df)
-    
     idf = IDF(inputCol="tf", outputCol="feature")
     modelidf = idf.fit(tf)
     tfidf = modelidf.transform(tf)
