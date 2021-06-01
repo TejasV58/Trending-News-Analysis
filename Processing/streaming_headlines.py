@@ -20,33 +20,33 @@ from sparknlp.pretrained import PretrainedPipeline
 from pyspark.ml.feature import HashingTF, IDF
 from pyspark.ml.feature import Normalizer
 from pyspark.mllib.linalg.distributed import IndexedRow, IndexedRowMatrix
+
 from pathlib import Path
 
 PROCESSING_DIR = Path(__file__).resolve().parent
 
-
-kafka_topic_name = "twitter"
+kafka_topic_name = "headlines"
 kafka_bootstrap_servers = 'localhost:9092'
 
-def preprocessing(tweets):
-    tweets = tweets.select(col("id"),col("text").alias("original_text"),explode(split(tweets.text, "t_end")).alias("text"), col("score"))
-    tweets = tweets.na.replace('', None)
-    tweets = tweets.na.drop()
-    tweets = tweets.withColumn('text', F.regexp_replace('text', r'http\S+', ''))
-    tweets = tweets.withColumn('text', F.regexp_replace('text', '@\w+', ''))
-    tweets = tweets.withColumn('text', F.regexp_replace('text', '#', ''))
-    tweets = tweets.withColumn('text', F.regexp_replace('text', 'RT', ''))
-    tweets = tweets.withColumn('text', F.regexp_replace('text', '\\n', ''))
-    tweets = tweets.withColumn('text', F.regexp_replace('text', '[.!?\\-]', ' '))
-    tweets = tweets.withColumn('text', F.regexp_replace('text', "[^ 'a-zA-Z0-9]", ''))
+def preprocessing(data):
+    data = data.select(col("id"),col("text").alias("original_text"),explode(split(data.text, "t_end")).alias("text"), col("score"))
+    data = data.na.replace('', None)
+    data = data.na.drop()
+    data = data.withColumn('text', F.regexp_replace('text', r'http\S+', ''))
+    data = data.withColumn('text', F.regexp_replace('text', '@\w+', ''))
+    data = data.withColumn('text', F.regexp_replace('text', '#', ''))
+    data = data.withColumn('text', F.regexp_replace('text', 'RT', ''))
+    data = data.withColumn('text', F.regexp_replace('text', '\\n', ''))
+    data = data.withColumn('text', F.regexp_replace('text', '[.!?\\-]', ' '))
+    data = data.withColumn('text', F.regexp_replace('text', "[^ 'a-zA-Z0-9]", ''))
 
     stopwords = ["ourselves", "her", "between", "yourself", "but", "again", "there", "about", "once", "during", "out", "very", "having", "with", "they", "own", "an", "be", "some", "for", "do", "its", "yours", "such", "into", "of", "most", "itself", "other", "off", "is", "am", "or", "who", "as", "from", "him", "each", "the", "themselves", "until", "below", "are", "we", "these", "your", "his", "through", "don", "nor", "me", "were", "her", "more", "himself", "this", "down", "should", "our", "their", "while", "above", "both", "up", "to", "ours", "had", "she", "all", "no", "when", "at", "any", "before", "them", "same", "and", "been", "have", "in", "will", "on", "does", "yourselves", "then", "that", "because", "what", "over", "why", "so", "can", "did", "not", "now", "under", "he", "you", "herself", "has", "just", "where", "too", "only", "myself", "which", "those", "i", "after", "few", "whom", "being", "if", "theirs", "my", "against", "a", "by", "doing", "it", "how", "further", "was", "here", "than"]
     
     for stopword in stopwords:
-        tweets = tweets.withColumn('text', F.regexp_replace('text', ' '+stopword+' ' , ' '))
-    tweets = tweets.withColumn('text', F.regexp_replace('text', ' +', ' '))
-    tweets.select(trim(col("text")))
-    return tweets
+        data = data.withColumn('text', F.regexp_replace('text', ' '+stopword+' ' , ' '))
+    data = data.withColumn('text', F.regexp_replace('text', ' +', ' '))
+    data.select(trim(col("text")))
+    return data
 
 def find_similarity(data,spark):
     dot_udf = F.udf(lambda x,y: float(x.dot(y)), DoubleType())
@@ -60,19 +60,14 @@ def find_similarity(data,spark):
     
 if __name__ == "__main__":
     
-    spark = SparkSession.builder.appName("PySpark Structured Streaming with Kafka").master("local[*]").getOrCreate()
+    spark = SparkSession.builder.appName("PySpark Structured Streaming with Kafka for headlines").master("local[*]").getOrCreate()
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
     print("\n\n=====================================================================")
-    print("Stream Data Processing Application Started.....")
+    print("Stream Headlines Processing Application Started.....")
     print("=====================================================================\n\n")
     spark.sparkContext.setLogLevel("ERROR")
 
-    headlines_path = PROCESSING_DIR.joinpath('headlines')
-
-    headlines_df =  spark.read.option("header","false").csv(str(headlines_path)+"/part-*.csv")
-    #allfiles.coalesce(1).write.format("csv").option("header", "false").save(str(headlines_path)+"/single_csv_file/")
-    #headlines_df = spark.read.csv(headlines_path+"/single_csv_file/part-*.csv")
     
     ############################  TF-IDF PIPELINE  ###############################
 
@@ -90,59 +85,57 @@ if __name__ == "__main__":
     pipeline_model = nlp_pipeline.fit(empty_df)
     light_pipeline = LightPipeline(pipeline_model)
 
-    ###################  Construct a streaming DataFrame for twitter  #########################
-
-    twitter_df = spark.readStream\
+    ##############  streaming DataFrame for headlines from newsapi, websearch api and inshorts  #############
+    flag = 0
+    headlines_df = spark.readStream\
         .format("kafka")\
         .option("kafka.bootstrap.servers", kafka_bootstrap_servers)\
-        .option("subscribe", "twitter")\
+        .option("subscribe", "headlines")\
         .option("startingOffsets", "latest")\
         .load()
 
-    twitter_df1 = twitter_df.selectExpr("CAST(value AS STRING)")
-    twitter_schema = StructType()\
+    headlines_schema = StructType()\
         .add("id", StringType())\
-        .add("text", StringType())\
-        .add("score", IntegerType())
-
-    twitter_df2 = twitter_df1.select(from_json(col("value"), twitter_schema).alias("twitter_columns"))
-    twitter_df3 = twitter_df2.select("twitter_columns.*")
-    twitter_final_df = preprocessing(twitter_df3)
-    complete_df = headlines_df
-    def foreach_batch_function(df, epoch_id):
-        global complete_df
-        complete_df = headlines_df.union(df)
-     
-    twitter_final_df.writeStream.foreachBatch(foreach_batch_function).start()
-    
-    complete_df.show()
-
-    df = twitter_final_df.withColumn("text", F.split("text", ' '))
-    twitter_tfidf = light_pipeline.transform(df)
-
-    #if len(twitter_tfidf.count()) != 0:
-    # similarities = find_similarity(twitter_tfidf,spark)
-
-    # query_tweets = similarities.writeStream\
-    #     .trigger(processingTime='5 seconds')\
-    #     .outputMode("append")\
-    #     .option("truncate", "true")\
-    #     .format("console")\
-    #     .start()
-    
-    #################### Write final result into console for debugging purpose  ##########################
-    
+        .add("text", StringType())
         
-    query_tweets = twitter_tfidf.writeStream\
-        .trigger(processingTime='2 seconds')\
+
+    headlines_df1 = headlines_df.selectExpr("CAST(value AS STRING)")     
+    headlines_df2 = headlines_df1\
+        .select(from_json(col("value"), headlines_schema)
+        .alias("headlines_columns"))
+    headlines_df3 = headlines_df2.select("headlines_columns.*")
+    headlines_df4 = headlines_df3.withColumn("score",lit(100))
+
+    final_df = preprocessing(headlines_df4)
+
+    #################### Write final result into console for debugging purpose  ##########################
+
+    headlines_path = PROCESSING_DIR.joinpath('headlines')
+    
+    query_headlines = final_df \
+        .writeStream.trigger(processingTime='2 seconds')\
         .outputMode("update")\
-        .option("truncate", "true")\
+        .option("truncate", "false")\
         .format("console")\
-        .start()    
+        .start()
+    
+    query_csv = final_df \
+        .writeStream.trigger(processingTime='2 seconds')\
+        .format("csv")\
+        .option("checkpointLocation", "checkpoint/")\
+        .option("path", headlines_path)\
+        .outputMode("append")\
+        .start()
 
-
+    # allfiles =  spark.read.option("header","false").csv(str(headlines_path)+"/part-*.csv")
+    # allfiles.coalesce(1).write.format("csv").option("header", "false").save(str(headlines_path)+"/single_csv_file/")
+        
     spark.streams.awaitAnyTermination()
 
+    # file = open("sample.txt","r+")
+    # file. truncate(0)
+    # file. close()
+
     print("\n\n=====================================================================")
-    print("Stream Data Processing Application Completed.")
+    print("Stream Headlines Processing Application Completed.")
     print("=====================================================================\n\n")
