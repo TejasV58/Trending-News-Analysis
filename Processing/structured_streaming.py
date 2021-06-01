@@ -24,7 +24,6 @@ from pathlib import Path
 
 PROCESSING_DIR = Path(__file__).resolve().parent
 
-
 kafka_topic_name = "twitter"
 kafka_bootstrap_servers = 'localhost:9092'
 
@@ -48,14 +47,23 @@ def preprocessing(tweets):
     tweets.select(trim(col("text")))
     return tweets
 
-def find_similarity(data,spark):
+def find_similarity(data):
     dot_udf = F.udf(lambda x,y: float(x.dot(y)), DoubleType())
-    data = data.alias("i").join(data.alias("j"), expr(F.col("i.ID") < F.col("j.ID")))\
-    .select(
-        F.col("i.ID").alias("i"), 
-        F.col("j.ID").alias("j"), 
-        dot_udf("i.norm", "j.norm").alias("dot"))
+    data = data.alias("i").join(data.alias("j")).select(
+        F.col("i.original_text").alias("i"),
+        F.col("j.original_text").alias("j"),
+        dot_udf("i.norm", "j.norm").alias("similarity_score"))
     return data
+
+def update_static_df(batch_df, static_df):
+    join_df = static_df.union(batch_df)
+    df = join_df.withColumn("text", F.split("text", ' '))
+    merged_tfidf = light_pipeline.transform(df)
+    similairty_scores_df = find_similarity(merged_tfidf)
+    similairty_scores_df = similairty_scores_df.filter(similairty_scores_df.similarity_score != 0)
+    similairty_scores_df = similairty_scores_df.filter(similairty_scores_df.i != similairty_scores_df.j)
+    similairty_scores_df.show(30, False)
+    return join_df
 
     
 if __name__ == "__main__":
@@ -64,15 +72,20 @@ if __name__ == "__main__":
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
     print("\n\n=====================================================================")
-    print("Stream Data Processing Application Started.....")
+    print("###########  Stream Data Processing Application Started  ############")
     print("=====================================================================\n\n")
     spark.sparkContext.setLogLevel("ERROR")
 
     headlines_path = PROCESSING_DIR.joinpath('headlines')
+    
+    headlines_schema = StructType([
+    StructField("id", StringType(), True),
+    StructField("original_text", StringType(), True),
+    StructField("text", StringType(), True),
+    StructField("score", IntegerType(), True),
+    ])
 
-    headlines_df =  spark.read.option("header","false").csv(str(headlines_path)+"/part-*.csv")
-    #allfiles.coalesce(1).write.format("csv").option("header", "false").save(str(headlines_path)+"/single_csv_file/")
-    #headlines_df = spark.read.csv(headlines_path+"/single_csv_file/part-*.csv")
+    headlines_df = spark.read.csv(str(headlines_path)+"/part-*.csv",header=False,schema=headlines_schema)
     
     ############################  TF-IDF PIPELINE  ###############################
 
@@ -108,38 +121,16 @@ if __name__ == "__main__":
     twitter_df2 = twitter_df1.select(from_json(col("value"), twitter_schema).alias("twitter_columns"))
     twitter_df3 = twitter_df2.select("twitter_columns.*")
     twitter_final_df = preprocessing(twitter_df3)
-    complete_df = headlines_df
-    def foreach_batch_function(df, epoch_id):
-        global complete_df
-        complete_df = headlines_df.union(df)
-     
-    twitter_final_df.writeStream.foreachBatch(foreach_batch_function).start()
     
-    complete_df.show()
 
-    df = twitter_final_df.withColumn("text", F.split("text", ' '))
-    twitter_tfidf = light_pipeline.transform(df)
-
-    #if len(twitter_tfidf.count()) != 0:
-    # similarities = find_similarity(twitter_tfidf,spark)
-
-    # query_tweets = similarities.writeStream\
-    #     .trigger(processingTime='5 seconds')\
-    #     .outputMode("append")\
-    #     .option("truncate", "true")\
-    #     .format("console")\
-    #     .start()
-    
     #################### Write final result into console for debugging purpose  ##########################
     
-        
-    query_tweets = twitter_tfidf.writeStream\
+    merge_query = twitter_final_df.writeStream\
         .trigger(processingTime='2 seconds')\
         .outputMode("update")\
-        .option("truncate", "true")\
         .format("console")\
-        .start()    
-
+        .foreachBatch(lambda each_headline_df, batchId: update_static_df(each_headline_df, headlines_df))\
+        .start()
 
     spark.streams.awaitAnyTermination()
 

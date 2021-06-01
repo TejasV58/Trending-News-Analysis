@@ -64,7 +64,7 @@ if __name__ == "__main__":
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
     print("\n\n=====================================================================")
-    print("Stream Headlines Processing Application Started.....")
+    print("#########  Stream Headlines Processing Application Started ##########")
     print("=====================================================================\n\n")
     spark.sparkContext.setLogLevel("ERROR")
 
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     query_headlines = final_df \
         .writeStream.trigger(processingTime='2 seconds')\
         .outputMode("update")\
-        .option("truncate", "false")\
+        .option("truncate", "true")\
         .format("console")\
         .start()
     
