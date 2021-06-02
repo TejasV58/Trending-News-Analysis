@@ -67,7 +67,7 @@ def update_static_df(batch_df, static_df):
 
     
 if __name__ == "__main__":
-    
+    print("Stream Data Processing Application Started ...\n")
     spark = SparkSession.builder.appName("PySpark Structured Streaming with Kafka").master("local[*]").getOrCreate()
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
@@ -88,6 +88,8 @@ if __name__ == "__main__":
     headlines_df = spark.read.csv(str(headlines_path)+"/part-*.csv",header=False,schema=headlines_schema)
     headlines_df = headlines_df.withColumn("type",lit("headlines"))
     
+    headlines_df1 = headlines_df.selectExpr("CAST(value AS STRING)")
+
     ############################  TF-IDF PIPELINE  ###############################
 
     hashingTF = HashingTF(inputCol="text", outputCol="tf")
@@ -106,20 +108,16 @@ if __name__ == "__main__":
 
     ###################  Construct a streaming DataFrame for twitter  #########################
 
-    twitter_df = spark.readStream\
-        .format("kafka")\
-        .option("kafka.bootstrap.servers", kafka_bootstrap_servers)\
-        .option("subscribe", "twitter")\
-        .option("startingOffsets", "latest")\
-        .load()
+    twitter_df = spark.readStream.format("kafka").option("kafka.bootstrap.servers", kafka_bootstrap_servers).option("subscribe", "twitter").option("startingOffsets", "latest").load()
 
     twitter_df1 = twitter_df.selectExpr("CAST(value AS STRING)")
-    twitter_schema = StructType()\
-        .add("id", StringType())\
-        .add("text", StringType())\
-        .add("score", IntegerType())
+
+    ################# Define a schema for twitter  #############################
+
+    twitter_schema = StructType().add("id", StringType()).add("text", StringType()).add("score", IntegerType())
 
     twitter_df2 = twitter_df1.select(from_json(col("value"), twitter_schema).alias("twitter_columns"))
+
     twitter_df3 = twitter_df2.select("twitter_columns.*")
     twitter_final_df = preprocessing(twitter_df3)
     
@@ -133,8 +131,8 @@ if __name__ == "__main__":
         .foreachBatch(lambda each_tweet_df, batchId: update_static_df(each_tweet_df, headlines_df))\
         .start()
 
+    
+
     spark.streams.awaitAnyTermination()
 
-    print("\n\n=====================================================================")
     print("Stream Data Processing Application Completed.")
-    print("=====================================================================\n\n")
