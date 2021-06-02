@@ -55,7 +55,7 @@ def find_similarity(data,spark):
     return data
 
 if __name__ == "__main__":
-    
+    print("Stream Data Processing Application Started ...\n")
     spark = SparkSession.builder.appName("PySpark Structured Streaming with Kafka").master("local[*]").getOrCreate()
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
@@ -64,7 +64,12 @@ if __name__ == "__main__":
     print("=====================================================================\n\n")
     spark.sparkContext.setLogLevel("ERROR")
 
+     # Construct a streaming DataFrame that reads from headlines from newsapi, websearch api and inshorts
+
+    headlines_df = spark.readStream.format("kafka").option("kafka.bootstrap.servers", kafka_bootstrap_servers).option("subscribe", "headlines").option("startingOffsets", "latest").load()
     
+    headlines_df1 = headlines_df.selectExpr("CAST(value AS STRING)")
+
     ############################  TF-IDF PIPELINE  ###############################
 
     hashingTF = HashingTF(inputCol="text", outputCol="tf")
@@ -82,48 +87,34 @@ if __name__ == "__main__":
     light_pipeline = LightPipeline(pipeline_model)
 
     ##############  streaming DataFrame for headlines from newsapi, websearch api and inshorts  #############
-    flag = 0
-    headlines_df = spark.readStream\
-        .format("kafka")\
-        .option("kafka.bootstrap.servers", kafka_bootstrap_servers)\
-        .option("subscribe", "headlines")\
-        .option("startingOffsets", "latest")\
-        .load()
 
-    headlines_schema = StructType()\
-        .add("id", StringType())\
-        .add("text", StringType())
-        
+    headlines_schema = StructType().add("title", StringType())
 
-    headlines_df1 = headlines_df.selectExpr("CAST(value AS STRING)")     
+    headlines_df2 = headlines_df1.select(from_json(col("value"), headlines_schema).alias("headlines_columns"))
+
+    headlines_df1 = headlines_df.selectExpr("CAST(value AS STRING)")
+    headlines_schema = StructType().add("title", StringType())      # Define a schema for headlines
     headlines_df2 = headlines_df1\
         .select(from_json(col("value"), headlines_schema)
         .alias("headlines_columns"))
     headlines_df3 = headlines_df2.select("headlines_columns.*")
     headlines_df4 = headlines_df3.withColumn("score",lit(100))
-    # if flag==0:
-    #     df4 = headlines_df4
-    #     flag=1
     ###################  Construct a streaming DataFrame for twitter  #########################
 
-    twitter_df = spark.readStream\
-        .format("kafka")\
-        .option("kafka.bootstrap.servers", kafka_bootstrap_servers)\
-        .option("subscribe", "twitter")\
-        .option("startingOffsets", "latest")\
-        .load()
+    twitter_df = spark.readStream.format("kafka").option("kafka.bootstrap.servers", kafka_bootstrap_servers).option("subscribe", "twitter").option("startingOffsets", "latest").load()
 
     twitter_df1 = twitter_df.selectExpr("CAST(value AS STRING)")
-    twitter_schema = StructType()\
-        .add("id", StringType())\
-        .add("text", StringType())\
-        .add("score", IntegerType())
+
+    ################# Define a schema for twitter  #############################
+
+    twitter_schema = StructType().add("id", StringType()).add("text", StringType()).add("score", IntegerType())
 
     twitter_df2 = twitter_df1.select(from_json(col("value"), twitter_schema).alias("twitter_columns"))
+
     twitter_df3 = twitter_df2.select("twitter_columns.*")
     twitter_final_df = preprocessing(twitter_df3)
 
-    # twitter_headlines_df = twitter_final_df.union(df4)
+    #twitter_headlines_df = twitter_final_df.union(df_2)
     df = twitter_final_df.withColumn("text", F.split("text", ' '))
     twitter_tfidf = light_pipeline.transform(df)
 
@@ -140,22 +131,22 @@ if __name__ == "__main__":
     #################### Write final result into console for debugging purpose  ##########################
     
     query_headlines = headlines_df4\
-        .writeStream.trigger(processingTime='2 seconds')\
+        .writeStream.trigger(processingTime='5 seconds')\
         .outputMode("update")\
         .option("truncate", "false")\
         .format("console")\
         .start()
         
     query_tweets = twitter_tfidf.writeStream\
-        .trigger(processingTime='2 seconds')\
+        .trigger(processingTime='5 seconds')\
         .outputMode("update")\
         .option("truncate", "true")\
         .format("console")\
         .start()    
 
 
+    
+
     spark.streams.awaitAnyTermination()
 
-    print("\n\n=====================================================================")
     print("Stream Data Processing Application Completed.")
-    print("=====================================================================\n\n")
