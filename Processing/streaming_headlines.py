@@ -86,7 +86,6 @@ if __name__ == "__main__":
     light_pipeline = LightPipeline(pipeline_model)
 
     ##############  streaming DataFrame for headlines from newsapi, websearch api and inshorts  #############
-    flag = 0
     headlines_df = spark.readStream\
         .format("kafka")\
         .option("kafka.bootstrap.servers", kafka_bootstrap_servers)\

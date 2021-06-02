@@ -18,7 +18,7 @@ producer = KafkaProducer(bootstrap_servers=['localhost:9092'],value_serializer=j
 def get_newsapi_news():
     api = api_keys["newsapikey"]
     newsapi = NewsApiClient(api_key=api)
-    news = newsapi.get_top_headlines(country='in',page_size=10,language='en')
+    news = newsapi.get_top_headlines(country='in',page_size=100,language='en')
     if news['articles']!=[]:
         for article in news['articles']:
             newsObject = {
