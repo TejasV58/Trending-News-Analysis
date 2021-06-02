@@ -54,8 +54,6 @@ def find_similarity(data,spark):
         dot_udf("i.norm", "j.norm").alias("dot"))
     return data
 
-
-    
 if __name__ == "__main__":
     
     spark = SparkSession.builder.appName("PySpark Structured Streaming with Kafka").master("local[*]").getOrCreate()
@@ -103,9 +101,9 @@ if __name__ == "__main__":
         .alias("headlines_columns"))
     headlines_df3 = headlines_df2.select("headlines_columns.*")
     headlines_df4 = headlines_df3.withColumn("score",lit(100))
-    if flag==0:
-        df4 = headlines_df4
-        flag=1
+    # if flag==0:
+    #     df4 = headlines_df4
+    #     flag=1
     ###################  Construct a streaming DataFrame for twitter  #########################
 
     twitter_df = spark.readStream\
@@ -125,7 +123,7 @@ if __name__ == "__main__":
     twitter_df3 = twitter_df2.select("twitter_columns.*")
     twitter_final_df = preprocessing(twitter_df3)
 
-    twitter_headlines_df = twitter_final_df.union(df4)
+    # twitter_headlines_df = twitter_final_df.union(df4)
     df = twitter_final_df.withColumn("text", F.split("text", ' '))
     twitter_tfidf = light_pipeline.transform(df)
 
@@ -148,7 +146,7 @@ if __name__ == "__main__":
         .format("console")\
         .start()
         
-    query_tweets = twitter_headlines_df.writeStream\
+    query_tweets = twitter_tfidf.writeStream\
         .trigger(processingTime='2 seconds')\
         .outputMode("update")\
         .option("truncate", "true")\
