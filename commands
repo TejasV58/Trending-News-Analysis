@@ -1,10 +1,10 @@
 # KAFKA
 -------------------------------------------------------------------
 Start zookeeper using :
-/opt/kafka_2.13-2.7.0/bin/zookeeper-server-start.sh config/zookeeper.properties
+bin/zookeeper-server-start.sh config/zookeeper.properties
 
 Start Kafka using :
-JMX_PORT=8004 /opt/kafka_2.13-2.7.0/bin/kafka-server-start.sh /opt/kafka_2.13-2.7.0/config/server.properties
+JMX_PORT=8004 bin/kafka-server-start.sh config/server.properties
 -------------------------------------------------------------------
 
 # CMAK
