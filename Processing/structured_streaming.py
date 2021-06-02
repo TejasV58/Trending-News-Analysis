@@ -86,6 +86,7 @@ if __name__ == "__main__":
     ])
 
     headlines_df = spark.read.csv(str(headlines_path)+"/part-*.csv",header=False,schema=headlines_schema)
+    headlines_df = headlines_df.withColumn("type",lit("headlines"))
     
     ############################  TF-IDF PIPELINE  ###############################
 
@@ -129,7 +130,7 @@ if __name__ == "__main__":
         .trigger(processingTime='2 seconds')\
         .outputMode("update")\
         .format("console")\
-        .foreachBatch(lambda each_headline_df, batchId: update_static_df(each_headline_df, headlines_df))\
+        .foreachBatch(lambda each_tweet_df, batchId: update_static_df(each_tweet_df, headlines_df))\
         .start()
 
     spark.streams.awaitAnyTermination()
