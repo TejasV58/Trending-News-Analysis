@@ -1,17 +1,12 @@
 
 from pyspark.ml import Pipeline
-from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
-from pyspark.sql.functions import expr
 
-import sparknlp
 from sparknlp.annotator import *
 from sparknlp.base import *
 
 from pyspark.ml.feature import HashingTF, IDF
 from pyspark.ml.feature import Normalizer
-from pathlib import Path
-
 
 def Tfidf_Pipeline(spark):
 

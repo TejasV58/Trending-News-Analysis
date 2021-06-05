@@ -38,7 +38,7 @@ def get_inshorts_news(category):
             content = None
 
         try:
-            date = card.find(clas='date').text
+            date = card.find(class_='date').text
         except AttributeError:
             date = None
 
@@ -48,7 +48,9 @@ def get_inshorts_news(category):
             time = None
 
         newsObject = {
-            'title': title
+            '_id':time+"-"+date,
+            'text': title,
+            'source':"inshorts"
         }
         print(newsObject)
         print('\n')
@@ -58,10 +60,8 @@ def get_inshorts_news(category):
 
 categories=["national","business","sports","world","politics","technology","startup","entertainment","miscellaneous","hatke","science","automobile"]
 
-def periodic_work(interval):
-    while True: 
-        for category in categories:
-            get_inshorts_news(category)
-        time.sleep(interval)
+def store_inshorts_news():
+    for category in categories:
+        get_inshorts_news(category)
 
-periodic_work(1800)
+store_inshorts_news()

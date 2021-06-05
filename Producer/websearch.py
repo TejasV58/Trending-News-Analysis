@@ -5,7 +5,7 @@ from kafka import KafkaProducer, KafkaConsumer
 
 url = "https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/search/TrendingNewsAPI"
 
-querystring = {"pageNumber":"1","pageSize":"5","withThumbnails":"false","location":"in"}
+querystring = {"pageNumber":"1","pageSize":"50","withThumbnails":"false","location":"in"}
 
 headers = {
     'x-rapidapi-key': "fc7294a7bfmsh4671f20cbd570f7p12e74ejsn9e1650af22e1",
@@ -23,16 +23,16 @@ def get_websearch_news():
     responses = requests.request("GET", url, headers=headers, params=querystring).json()
     for response in responses["value"]:
         newsObject = {
-            'title': response["title"]
+            '_id':response["id"],
+            'text': response["title"],
+            'source':"websearch"
         }
         print(newsObject)
         print('\n')
         producer.send(topic_name,newsObject)
         producer.flush()
 
-def periodic_work(interval):
-    while True: 
-        get_websearch_news()
-        time.sleep(interval)
+def store_websearch_news():
+    get_websearch_news()
 
-periodic_work(1800)
+store_websearch_news()

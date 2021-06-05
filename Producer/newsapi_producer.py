@@ -22,8 +22,9 @@ def get_newsapi_news():
     if news['articles']!=[]:
         for article in news['articles']:
             newsObject = {
-                'id':article["publishedAt"],
-                'text': article["title"]
+                '_id':article["publishedAt"],
+                'text': article["title"],
+                'source':"newsapi"
             }
             print(newsObject)
             print('\n')
@@ -31,9 +32,7 @@ def get_newsapi_news():
             producer.flush()
 
     
-def periodic_work(interval):
-    while True: 
-        get_newsapi_news()
-        time.sleep(interval)
+def store_newsapi_news():
+    get_newsapi_news()
 
-periodic_work(1800)
+store_newsapi_news()

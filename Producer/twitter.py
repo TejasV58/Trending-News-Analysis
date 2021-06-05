@@ -42,6 +42,7 @@ def get_twitter_data():
         for tweet in tweets:
             record={}
             record['id']=str(tweet.id)
+            record['source'] = "twitter"
             if 'retweeted_status' in tweet._json:
                 record['text']=str(tweet._json['retweeted_status']['full_text']).lower()
                 record['score']=int(tweet.retweet_count)*2

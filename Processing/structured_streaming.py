@@ -7,13 +7,9 @@ from pyspark.sql.types import *
 from pyspark.sql import functions as F
 import time
 
-from pyspark.sql import SparkSession
-import pyspark.sql.functions as F
-from pyspark.sql.functions import expr
-
 from pathlib import Path
 
-from preprocessing import *
+from preprocessing import preprocessing
 from Tfidf_Pipeline import Tfidf_Pipeline
 
 PROCESSING_DIR = Path(__file__).resolve().parent
@@ -66,7 +62,6 @@ def update_static_df(batch_df, static_df):
 
 if __name__ == "__main__":
 
-
     spark = SparkSession.builder\
         .appName("PySpark Structured Streaming with Kafka")\
         .master("local[*]")\
@@ -82,10 +77,10 @@ if __name__ == "__main__":
     headlines_path = PROCESSING_DIR.joinpath('headlines')
     
     headlines_schema = StructType([
-    StructField("id", StringType(), True),
-    StructField("original_text", StringType(), True),
-    StructField("text", StringType(), True),
-    StructField("score", IntegerType(), True),
+        StructField("id", StringType(), True),
+        StructField("original_text", StringType(), True),
+        StructField("text", StringType(), True),
+        StructField("score", IntegerType(), True),
     ])
 
     headlines_df = spark.read.csv(str(headlines_path)+"/part-*.csv",header=False,schema=headlines_schema)
@@ -117,7 +112,8 @@ if __name__ == "__main__":
     twitter_schema = StructType()\
         .add("id", StringType())\
         .add("text", StringType())\
-        .add("score", IntegerType())
+        .add("score", IntegerType())\
+        .add("source", StringType())
 
     twitter_df2 = twitter_df1.select(from_json(col("value"), twitter_schema).alias("twitter_columns"))
     twitter_df3 = twitter_df2.select("twitter_columns.*")
