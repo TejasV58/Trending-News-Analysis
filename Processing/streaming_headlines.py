@@ -57,9 +57,7 @@ def find_similarity(data,spark):
         dot_udf("i.norm", "j.norm").alias("dot"))
     return data
 
-    
 if __name__ == "__main__":
-    
     spark = SparkSession.builder.appName("PySpark Structured Streaming with Kafka for headlines").master("local[*]").getOrCreate()
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
