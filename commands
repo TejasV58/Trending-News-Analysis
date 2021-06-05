@@ -19,5 +19,5 @@ spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.0.2 ka
 spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.1 structured_streaming.py
 
 spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.1,com.johnsnowlabs.nlp:spark-nlp_2.12:3.0.3 structured_streaming.py
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.1,com.johnsnowlabs.nlp:spark-nlp_2.12:3.0.3,org.mongodb.spark:mongo-spark-connector_2.12:3.0.1 streaming_headlines.py
 -------------------------------------------------------------------
-
