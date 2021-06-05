@@ -23,8 +23,6 @@ from pyspark.mllib.linalg.distributed import IndexedRow, IndexedRowMatrix
 
 from pathlib import Path
 
-import pymongo
-from pymongo import MongoClient
 
 # cluster = MongoClient ("mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")
 
