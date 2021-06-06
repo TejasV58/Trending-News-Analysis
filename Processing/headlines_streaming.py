@@ -24,9 +24,6 @@ def find_similarity(data):
     newsapi_df = data.filter(data.source == "newsapi")
     websearch_df = data.filter(data.source == "websearch")
 
-    inshorts_df.show()
-    newsapi_df.show()
-
     dot_udf = F.udf(lambda x,y: float(x.dot(y)), DoubleType())
     joined_df = inshorts_df.alias('inshorts').join(newsapi_df.alias('newsapi')).select(
         F.col("inshorts._id").alias("inshorts_id"),
@@ -37,7 +34,17 @@ def find_similarity(data):
         F.col("newsapi.score").alias("newsapi_score"),
         dot_udf("inshorts.norm", "newsapi.norm").alias("similarity_score"))
 
-    joined_df.show()
+    joined_df = joined_df.filter(joined_df.similarity_score > 0.3)
+    joined_df.show(80,True)
+    
+    inshorts_similar_df = joined_df.select(col("inshorts_id"))
+    inshorts_filtered = inshorts_df.join(inshorts_similar_df, inshorts_df._id == inshorts_similar_df.inshorts_id,"left_anti")
+
+    newsapi_similar_df = joined_df.select(col("newsapi_id"))
+    newsapi_filtered = newsapi_df.join(newsapi_similar_df, newsapi_df._id == newsapi_similar_df.newsapi_id,"left_anti")
+
+    print(str(inshorts_df.count())+" "+str(inshorts_similar_df.count())+" "+str(inshorts_filtered.count()))
+    print(str(newsapi_df.count())+" "+str(newsapi_similar_df.count())+" "+str(newsapi_filtered.count()))
 
     return joined_df
 
@@ -73,7 +80,6 @@ if __name__ == "__main__":
     
     spark.sparkContext.setLogLevel("ERROR")
 
-
     ############################  TF-IDF PIPELINE  ###############################
 
     light_pipeline = Tfidf_Pipeline(spark)
@@ -84,8 +90,8 @@ if __name__ == "__main__":
         .format("kafka")\
         .option("kafka.bootstrap.servers", kafka_bootstrap_servers)\
         .option("subscribe", "headlines")\
-        .option("startingOffsets", "earliest")\
-        .option("fetchOffset.retryIntervalMs",10000)\
+        .option("startingOffsets", "latest")\
+        .option("maxOffsetsPerTrigger",500)\
         .load()
 
     headlines_schema = StructType()\
