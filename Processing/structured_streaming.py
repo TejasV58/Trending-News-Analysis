@@ -33,14 +33,14 @@ def find_similarity(data):
     return joined_df
 
 
-def update_static_df(batch_df, static_df):
+def update_static_df(batch_df):
 
+    headlines_df = spark.read.format("mongo").option("uri","mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase.Headlines").load()
+    static_df = headlines_df.withColumn("type",lit("headlines"))
+    static_df = static_df.select(col("_id"),col("original_text"),col("text"),col("score"),col("source"),col("type"))
+    headlines_df.show()
+    batch_df.show()
     join_df = static_df.union(batch_df)
-
-    columns = ['_id', 'original_text', 'score', 'type', 'norm']
-    vals = [("1#2#3#4#5#6#", "hello hello ", 0,"tweets","hello hello"),("6#5#4#3#2#1#", "hello hello", 0,"headlines","hello hello")]
-    empty_df = spark.createDataFrame(vals, columns)
-    df = join_df.union(empty_df)
 
     df = join_df.withColumn("text", F.split("text", ' '))
     merged_tfidf = light_pipeline.transform(df)
@@ -48,15 +48,15 @@ def update_static_df(batch_df, static_df):
     merged_tfidf = merged_tfidf.drop(*columns_to_drop)
 
     similairty_scores_df = find_similarity(merged_tfidf)
-    similairty_scores_df = similairty_scores_df.filter(similairty_scores_df.similarity_score > 0.1)
-    similairty_scores_df.show(30, True)
+    similairty_scores_df = similairty_scores_df.filter(similairty_scores_df.similarity_score > 0.3)
+    similairty_scores_df.show(30, False)
 
     merged_scores = similairty_scores_df.withColumn('score', col('headline_score')+col('tweet_score'))
     columns_to_drop = ['tweet_id','tweet_score','tweet_text','headline_score','similarity_score']
     merged_scores = merged_scores.drop(*columns_to_drop)
-    merged_scores.show()
     merged_scores_grp = merged_scores.groupBy("headline_id").sum("score")
-    merged_scores_grp.show()
+    merged_scores_grp.show(50,False)
+    
     return join_df
 
 
@@ -85,9 +85,9 @@ if __name__ == "__main__":
         StructField("source", StringType(),True)
     ])
 
-    headlines_df = spark.read.format("mongo").option("uri","mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase.Headlines").load()
-    headlines_df.show()
-    headlines_df = headlines_df.withColumn("type",lit("headlines"))
+    # headlines_df = spark.read.format("mongo").option("uri","mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase.Headlines").load()
+    # headlines_df.show()
+    # headlines_df = headlines_df.withColumn("type",lit("headlines"))
     
     #============================================================================================#
     ###################################  TF-IDF PIPELINE  ########################################
@@ -131,7 +131,7 @@ if __name__ == "__main__":
         .trigger(processingTime='2 seconds')\
         .outputMode("update")\
         .format("console")\
-        .foreachBatch(lambda each_tweet_df, batchId: update_static_df(each_tweet_df, headlines_df))\
+        .foreachBatch(lambda each_tweet_df, batchId: update_static_df(each_tweet_df))\
         .start()
 
     spark.streams.awaitAnyTermination()

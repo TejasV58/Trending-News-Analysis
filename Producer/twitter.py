@@ -41,7 +41,7 @@ def get_twitter_data():
                 lang="en").items(5)
         for tweet in tweets:
             record={}
-            record['id']=str(tweet.id)
+            record['_id']=str(tweet.id)
             record['source'] = "twitter"
             if 'retweeted_status' in tweet._json:
                 record['text']=str(tweet._json['retweeted_status']['full_text']).lower()
