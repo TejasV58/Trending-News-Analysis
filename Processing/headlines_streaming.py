@@ -84,6 +84,7 @@ def find_similiar_headlines(df):
 
     df = df.withColumn("text", F.split("text", ' '))
     tfidf = light_pipeline.transform(df)
+    
     columns_to_drop = ['text','tf','feature']
     tfidf = tfidf.drop(*columns_to_drop)
 
@@ -152,7 +153,7 @@ if __name__ == "__main__":
 
     #################### Write final result into console for debugging purpose  ##########################
 
-    headlines_path = PROCESSING_DIR.joinpath('headlines')
+    #headlines_path = PROCESSING_DIR.joinpath('headlines')
     
     query_headlines = final_df \
         .writeStream.trigger(processingTime='10 seconds')\
