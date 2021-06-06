@@ -117,4 +117,5 @@ while True:
     for headline in news_headlines:
         producer.send(topic_name,headline)
         producer.flush()
+    print(len(news_headlines))
     time.sleep(1800)

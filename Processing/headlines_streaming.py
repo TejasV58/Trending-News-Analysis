@@ -32,10 +32,11 @@ def find_similarity(data):
         F.col("newsapi.original_text").alias("newsapi_text"),
         F.col("inshorts.score").alias("inshorts_score"),
         F.col("newsapi.score").alias("newsapi_score"),
+        F.col("inshorts.norm").alias("inshorts_norm"),
+        F.col("inshorts.source").alias("source"),
         dot_udf("inshorts.norm", "newsapi.norm").alias("similarity_score"))
 
     joined_df = joined_df.filter(joined_df.similarity_score > 0.3)
-    joined_df.show(80,True)
     
     inshorts_similar_df = joined_df.select(col("inshorts_id"))
     inshorts_filtered = inshorts_df.join(inshorts_similar_df, inshorts_df._id == inshorts_similar_df.inshorts_id,"left_anti")
@@ -43,10 +44,39 @@ def find_similarity(data):
     newsapi_similar_df = joined_df.select(col("newsapi_id"))
     newsapi_filtered = newsapi_df.join(newsapi_similar_df, newsapi_df._id == newsapi_similar_df.newsapi_id,"left_anti")
 
-    print(str(inshorts_df.count())+" "+str(inshorts_similar_df.count())+" "+str(inshorts_filtered.count()))
-    print(str(newsapi_df.count())+" "+str(newsapi_similar_df.count())+" "+str(newsapi_filtered.count()))
+    joined_df = joined_df.withColumn('score', col('inshorts_score')+col('newsapi_score'))
+    joined_df = joined_df.select(col("inshorts_id").alias("_id"),col("inshorts_text").alias("original_text"),col("score"),col("source"),col("inshorts_norm").alias("norm"))
+    joined_df = joined_df.union(inshorts_filtered)
+    joined_df = joined_df.union(newsapi_filtered)
+    
+    joined_final_df = joined_df.alias('joined').join(websearch_df.alias('websearch')).select(
+        F.col("joined._id").alias("joined_id"),
+        F.col("websearch._id").alias("websearch_id"),
+        F.col("joined.original_text").alias("joined_text"),
+        F.col("websearch.original_text").alias("websearch_text"),
+        F.col("joined.score").alias("joined_score"),
+        F.col("websearch.score").alias("websearch_score"),
+        F.col("joined.norm").alias("norm"),
+        F.col("joined.source").alias("source"),
+        dot_udf("joined.norm", "websearch.norm").alias("similarity_score"))
 
-    return joined_df
+    joined_final_df = joined_final_df.filter(joined_final_df.similarity_score > 0.3)
+
+    joined_similar_df = joined_final_df.select(col("joined_id"))
+    joined_filtered = joined_df.join(joined_similar_df, joined_df._id == joined_similar_df.joined_id,"left_anti")
+
+    websearch_similar_df = joined_final_df.select(col("websearch_id"))
+    websearch_filtered = websearch_df.join(websearch_similar_df, websearch_df._id == websearch_similar_df.websearch_id,"left_anti")
+
+    joined_final_df = joined_final_df.withColumn('score', col('joined_score')+col('websearch_score'))
+    joined_final_df = joined_final_df.select(col("joined_id").alias("_id"),col("joined_text").alias("original_text"),col("score"),col("source"),col("norm"))
+    joined_final_df = joined_final_df.union(joined_filtered)
+    joined_final_df = joined_final_df.union(websearch_filtered)
+    joined_final_df = joined_final_df.limit(150)
+    joined_final_df = joined_final_df.drop('norm')
+    joined_final_df = joined_final_df.withColumnRenamed('original_text','text')
+
+    return joined_final_df
 
 
 def find_similiar_headlines(df):
@@ -57,15 +87,9 @@ def find_similiar_headlines(df):
     tfidf = tfidf.drop(*columns_to_drop)
 
     similairty_scores_df = find_similarity(tfidf)
-    # similairty_scores_df = similairty_scores_df.filter(similairty_scores_df.similarity_score > 0.5)
-    # similairty_scores_df.show(30, True)
-
-    # merged_scores = similairty_scores_df.withColumn('score', col('headline_score')+col('tweet_score'))
-    # columns_to_drop = ['tweet_id','tweet_score','tweet_text','headline_score','similarity_score']
-    # merged_scores = merged_scores.drop(*columns_to_drop)
-    # merged_scores.show()
-    # merged_scores_grp = merged_scores.groupBy("headline_id").sum("score")
-    # merged_scores_grp.show()
+    similairty_scores_df.show()
+    final_df = preprocessing(similairty_scores_df)
+    final_df.show()
     return df
 
 
