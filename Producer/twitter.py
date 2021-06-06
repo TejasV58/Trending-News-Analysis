@@ -38,7 +38,7 @@ def get_twitter_data():
         tweets = tweepy.Cursor(api.search,
                 q=trend,
                 tweet_mode = 'extended',
-                lang="en").items(5)
+                lang="en").items(4)
         for tweet in tweets:
             record={}
             record['_id']=str(tweet.id)

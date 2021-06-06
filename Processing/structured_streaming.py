@@ -38,8 +38,9 @@ def update_static_df(batch_df):
     headlines_df = spark.read.format("mongo").option("uri","mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase.Headlines").load()
     static_df = headlines_df.withColumn("type",lit("headlines"))
     static_df = static_df.select(col("_id"),col("original_text"),col("text"),col("score"),col("source"),col("type"))
-    headlines_df.show()
+    static_df.show()
     batch_df.show()
+
     join_df = static_df.union(batch_df)
 
     df = join_df.withColumn("text", F.split("text", ' '))
@@ -48,7 +49,8 @@ def update_static_df(batch_df):
     merged_tfidf = merged_tfidf.drop(*columns_to_drop)
 
     similairty_scores_df = find_similarity(merged_tfidf)
-    similairty_scores_df = similairty_scores_df.filter(similairty_scores_df.similarity_score > 0.3)
+    similairty_scores_df = similairty_scores_df.filter(similairty_scores_df.similarity_score > 0.2)
+    similairty_scores_df = similairty_scores_df.dropDuplicates(['tweet_id'])
     similairty_scores_df.show(30, False)
 
     merged_scores = similairty_scores_df.withColumn('score', col('headline_score')+col('tweet_score'))
@@ -56,8 +58,22 @@ def update_static_df(batch_df):
     merged_scores = merged_scores.drop(*columns_to_drop)
     merged_scores_grp = merged_scores.groupBy("headline_id").sum("score")
     merged_scores_grp.show(50,False)
-    
-    return join_df
+
+    similar_headline_ids = merged_scores_grp.select(col("headline_id"))
+    headline_filtered = static_df.join(similar_headline_ids, static_df._id == similar_headline_ids.headline_id,"left_anti")
+    headline_filtered = headline_filtered.select(col("_id"),col("original_text"),col("text"),col("score"),col("source"))
+
+    matching_headlines = static_df.join(merged_scores_grp , static_df._id == merged_scores_grp.headline_id)
+    columns_to_drop = ['headline_id','score']
+    matching_headlines = matching_headlines.drop(*columns_to_drop)
+    matching_headlines = matching_headlines.withColumnRenamed('sum(score)','score')
+    matching_headlines = matching_headlines.select(col("_id"),col("original_text"),col("text"),col("score"),col("source"))
+    matching_headlines.show(20,False)
+
+    new_headlines_df = matching_headlines.union(headline_filtered)
+    new_headlines_df.show()
+
+    return new_headlines_df
 
 
 if __name__ == "__main__":
