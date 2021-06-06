@@ -35,7 +35,12 @@ def find_similarity(data):
 
 def update_static_df(batch_df):
 
-    headlines_df = spark.read.format("mongo").option("uri","mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase.Headlines").load()
+    headlines_df = spark.read.format("mongo")\
+        .option("uri","mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")\
+        .option("database", "TrendingNewsDatabase")\
+        .option("collection", "Headlines")\
+        .load()
+
     static_df = headlines_df.withColumn("type",lit("headlines"))
     static_df = static_df.select(col("_id"),col("original_text"),col("text"),col("score"),col("source"),col("type"))
     static_df.show()
@@ -72,6 +77,18 @@ def update_static_df(batch_df):
 
     new_headlines_df = matching_headlines.union(headline_filtered)
     new_headlines_df.show()
+
+    new_headlines_df.write\
+        .format(source="mongo")\
+        .mode(saveMode="append")\
+        .option("uri", "mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")\
+        .option("database", "TrendingNewsDatabase")\
+        .option("collection", "Headlines")\
+        .save()
+
+    print("\n\n=====================================================================")
+    print("###############  Headlines updated in Mongo Database ################")
+    print("=====================================================================\n\n")
 
     return new_headlines_df
 

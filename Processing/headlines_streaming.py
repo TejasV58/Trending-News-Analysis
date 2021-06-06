@@ -72,9 +72,10 @@ def find_similarity(data):
     joined_final_df = joined_final_df.select(col("joined_id").alias("_id"),col("joined_text").alias("original_text"),col("score"),col("source"),col("norm"))
     joined_final_df = joined_final_df.union(joined_filtered)
     joined_final_df = joined_final_df.union(websearch_filtered)
-    joined_final_df = joined_final_df.limit(150)
+    joined_final_df = joined_final_df.limit(250)
     joined_final_df = joined_final_df.drop('norm')
     joined_final_df = joined_final_df.withColumnRenamed('original_text','text')
+
 
     return joined_final_df
 
@@ -93,7 +94,7 @@ def find_similiar_headlines(df):
     final_df.write\
         .format(source="mongo")\
         .mode(saveMode="append")\
-        .option("uri", "mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true w=majority")\
+        .option("uri", "mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")\
         .option("database", "TrendingNewsDatabase")\
         .option("collection", "Headlines")\
         .save()
@@ -145,7 +146,7 @@ if __name__ == "__main__":
         .select(from_json(col("value"), headlines_schema)
         .alias("headlines_columns"))
     headlines_df3 = headlines_df2.select("headlines_columns.*")
-    headlines_df4 = headlines_df3.withColumn("score",lit(100))
+    headlines_df4 = headlines_df3.withColumn("score",lit(1000))
 
     final_df = preprocessing(headlines_df4)
 
