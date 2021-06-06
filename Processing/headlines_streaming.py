@@ -13,6 +13,9 @@ import time
 from preprocessing import preprocessing
 from Tfidf_Pipeline import Tfidf_Pipeline
 
+import pymongo
+from pymongo import MongoClient
+
 PROCESSING_DIR = Path(__file__).resolve().parent
 
 kafka_topic_name = "headlines"
@@ -89,13 +92,22 @@ def find_similiar_headlines(df):
     similairty_scores_df = find_similarity(tfidf)
     similairty_scores_df.show()
     final_df = preprocessing(similairty_scores_df)
+    final_df.write\
+    .format(source = "mongo")\
+    .mode(saveMode = "append")\
+    .option("uri","mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true w=majority")\
+    .option("database","TrendingNewsDatabase")\
+    .option("collection","Headlines")\
+    .save()
     final_df.show()
     return df
 
 
 if __name__ == "__main__":
-    
-    spark = SparkSession.builder.appName("PySpark Structured Streaming with Kafka for headlines").master("local[*]").getOrCreate()
+    spark = SparkSession.builder.appName("PySpark Structured Streaming with Kafka for headlines")
+    .config("spark.mongodb.input.uri", "mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")\
+    .config("spark.mongodb.output.uri", "mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")\
+    .master("local[*]").getOrCreate()
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
     print("\n\n=====================================================================")
