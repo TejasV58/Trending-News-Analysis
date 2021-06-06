@@ -22,8 +22,8 @@ def find_similarity(data):
     headline_df = data.filter(data.type == "headlines")
     dot_udf = F.udf(lambda x,y: float(x.dot(y)), DoubleType())
     joined_df = headline_df.alias('headlines').join(tweet_df.alias('tweets')).select(
-        F.col("tweets.id").alias("tweet_id"),
-        F.col("headlines.id").alias("headline_id"),
+        F.col("tweets._id").alias("tweet_id"),
+        F.col("headlines._id").alias("headline_id"),
         F.col("headlines.original_text").alias("headline_text"),
         F.col("tweets.original_text").alias("tweet_text"),
         F.col("tweets.score").alias("tweet_score"),
@@ -37,7 +37,7 @@ def update_static_df(batch_df, static_df):
 
     join_df = static_df.union(batch_df)
 
-    columns = ['id', 'original_text', 'score', 'type', 'norm']
+    columns = ['_id', 'original_text', 'score', 'type', 'norm']
     vals = [("1#2#3#4#5#6#", "hello hello ", 0,"tweets","hello hello"),("6#5#4#3#2#1#", "hello hello", 0,"headlines","hello hello")]
     empty_df = spark.createDataFrame(vals, columns)
     df = join_df.union(empty_df)
@@ -61,9 +61,10 @@ def update_static_df(batch_df, static_df):
 
 
 if __name__ == "__main__":
-
     spark = SparkSession.builder\
         .appName("PySpark Structured Streaming with Kafka")\
+        .config("spark.mongodb.input.uri", "mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")\
+        .config("spark.mongodb.output.uri", "mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")\
         .master("local[*]")\
         .getOrCreate()
 
@@ -77,13 +78,15 @@ if __name__ == "__main__":
     headlines_path = PROCESSING_DIR.joinpath('headlines')
     
     headlines_schema = StructType([
-        StructField("id", StringType(), True),
+        StructField("_id", StringType(), True),
         StructField("original_text", StringType(), True),
         StructField("text", StringType(), True),
         StructField("score", IntegerType(), True),
+        StructField("source", StringType(),True)
     ])
 
-    headlines_df = spark.read.csv(str(headlines_path)+"/part-*.csv",header=False,schema=headlines_schema)
+    headlines_df = spark.read.format("mongo").option("uri","mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase.Headlines").load()
+    headlines_df.show()
     headlines_df = headlines_df.withColumn("type",lit("headlines"))
     
     #============================================================================================#
@@ -110,7 +113,7 @@ if __name__ == "__main__":
     #============================================================================================#
 
     twitter_schema = StructType()\
-        .add("id", StringType())\
+        .add("_id", StringType())\
         .add("text", StringType())\
         .add("score", IntegerType())\
         .add("source", StringType())
