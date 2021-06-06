@@ -5,7 +5,7 @@ from kafka import KafkaProducer, KafkaConsumer
 
 url = "https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/search/TrendingNewsAPI"
 
-querystring = {"pageNumber":"1","pageSize":"50","withThumbnails":"false","location":"in"}
+querystring = {"pageNumber":"1","pageSize":"100","withThumbnails":"false","location":"in"}
 
 headers = {
     'x-rapidapi-key': "fc7294a7bfmsh4671f20cbd570f7p12e74ejsn9e1650af22e1",

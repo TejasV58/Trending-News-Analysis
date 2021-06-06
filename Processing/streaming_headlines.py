@@ -23,27 +23,16 @@ from pyspark.mllib.linalg.distributed import IndexedRow, IndexedRowMatrix
 
 from pathlib import Path
 
-
-# cluster = MongoClient ("mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")
-
-# db = cluster["TrendingNewsDatabase"]
-# collection = db["Headlines"]
+import pymongo
+from pymongo import MongoClient
 
 PROCESSING_DIR = Path(__file__).resolve().parent
 
 kafka_topic_name = "headlines"
 kafka_bootstrap_servers = 'localhost:9092'
 
-# mongodb_host_name = "localhost"
-# mongodb_port_no = "27017"
-# mongodb_user_name = "admin"
-# mongodb_password = "admin"
-# mongodb_database_name = "TrendingNewsDatabase"
-# mongodb_collection_name = "Headlines"
-# mongo_uri="mongodb://" + mongodb_user_name + ":" + mongodb_password + "@" + mongodb_host_name + ":" + mongodb_port_no + "/" + mongodb_database_name + "." + mongodb_collection_name
-
 def preprocessing(data):
-    data = data.select(col("id").alias("_id"),col("text").alias("original_text"),explode(split(data.text, "t_end")).alias("text"), col("score"))
+    data = data.select(col("_id"),col("text").alias("original_text"),explode(split(data.text, "t_end")).alias("text"), col("score"))
     data = data.na.replace('', None)
     data = data.na.drop()
     data = data.withColumn('text', F.regexp_replace('text', r'http\S+', ''))
@@ -75,23 +64,19 @@ def store_mongo(headlines):
     headlines.write\
     .format(source = "mongo")\
     .mode(saveMode = "append")\
-    .option("uri","mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")\
+    .option("uri","mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true w=majority")\
     .option("database","TrendingNewsDatabase")\
     .option("collection","Headlines")\
     .save()
-    # headlines = [row.asDict() for row in headlines.collect()]
-    # for headline in headlines:
-    #     collection.insert_one(headline)
 
 if __name__ == "__main__":
     
     spark = SparkSession.builder\
     .appName("PySpark Structured Streaming with Kafka for headlines")\
-    .master("local[*]")\
     .config("spark.mongodb.input.uri", "mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")\
     .config("spark.mongodb.output.uri", "mongodb+srv://sanikatejas:10thmay@cluster0.095pi.mongodb.net/TrendingNewsDatabase?retryWrites=true&w=majority")\
+    .master("local[*]")\
     .getOrCreate()
-    
     
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
@@ -126,7 +111,7 @@ if __name__ == "__main__":
         .load()
 
     headlines_schema = StructType()\
-        .add("id", StringType())\
+        .add("_id", StringType())\
         .add("text", StringType())
         
 
@@ -135,7 +120,7 @@ if __name__ == "__main__":
         .select(from_json(col("value"), headlines_schema)
         .alias("headlines_columns"))
     headlines_df3 = headlines_df2.select("headlines_columns.*")
-    headlines_df4 = headlines_df3.withColumn("score",lit(100))
+    headlines_df4 = headlines_df3.withColumn("score",lit(200))
 
     final_df = preprocessing(headlines_df4)
     
@@ -150,23 +135,8 @@ if __name__ == "__main__":
         .format("console")\
         .foreachBatch(lambda each_headline_df, batchId: store_mongo(each_headline_df))\
         .start()
-    
-    # query_csv = final_df \
-    #     .writeStream.trigger(processingTime='2 seconds')\
-    #     .format("csv")\
-    #     .option("checkpointLocation", "checkpoint/")\
-    #     .option("path", headlines_path)\
-    #     .outputMode("append")\
-    #     .start()
-
-    # allfiles =  spark.read.option("header","false").csv(str(headlines_path)+"/part-*.csv")
-    # allfiles.coalesce(1).write.format("csv").option("header", "false").save(str(headlines_path)+"/single_csv_file/")
         
     spark.streams.awaitAnyTermination()
-
-    # file = open("sample.txt","r+")
-    # file. truncate(0)
-    # file. close()
 
     print("\n\n=====================================================================")
     print("Stream Headlines Processing Application Completed.")
