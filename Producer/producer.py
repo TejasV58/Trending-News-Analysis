@@ -61,8 +61,6 @@ def get_inshorts_news(category):
         news_headlines.append(newsObject)
         print(newsObject)
         print('\n')
-        # producer.send(topic_name,newsObject)
-        # producer.flush()
        
 
 def store_inshorts_news():
@@ -84,8 +82,6 @@ def get_newsapi_news():
             news_headlines.append(newsObject)
             print(newsObject)
             print('\n')
-            # producer.send(topic_name,newsObject)
-            # producer.flush()
 
 url = "https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/search/TrendingNewsAPI"
 
@@ -107,16 +103,18 @@ def get_websearch_news():
         news_headlines.append(newsObject)
         print(newsObject)
         print('\n')
-        # producer.send(topic_name,newsObject)
-        # producer.flush()
 
 while True:
     get_websearch_news()
     store_inshorts_news()
     get_newsapi_news()
+    count=0
     for headline in news_headlines:
+        if headline['source'] == "websearch":
+            count+=1
         producer.send(topic_name,headline)
         producer.flush()
     print(len(news_headlines))
+    print(count)
     news_headlines = []
     time.sleep(1800)

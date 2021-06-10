@@ -72,7 +72,7 @@ def find_similarity(data):
     joined_final_df = joined_final_df.select(col("joined_id").alias("_id"),col("joined_text").alias("original_text"),col("score"),col("source"),col("norm"))
     joined_final_df = joined_final_df.union(joined_filtered)
     joined_final_df = joined_final_df.union(websearch_filtered)
-    joined_final_df = joined_final_df.limit(250)
+    joined_final_df = joined_final_df.limit(350)
     joined_final_df = joined_final_df.drop('norm')
     joined_final_df = joined_final_df.withColumnRenamed('original_text','text')
 

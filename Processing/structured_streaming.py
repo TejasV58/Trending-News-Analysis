@@ -54,7 +54,7 @@ def update_static_df(batch_df):
     merged_tfidf = merged_tfidf.drop(*columns_to_drop)
 
     similairty_scores_df = find_similarity(merged_tfidf)
-    similairty_scores_df = similairty_scores_df.filter(similairty_scores_df.similarity_score > 0.2)
+    similairty_scores_df = similairty_scores_df.filter(similairty_scores_df.similarity_score > 0.25)
     similairty_scores_df = similairty_scores_df.dropDuplicates(['tweet_id'])
     similairty_scores_df.show(30, False)
 
