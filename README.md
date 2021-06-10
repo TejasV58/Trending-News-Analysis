@@ -6,29 +6,32 @@ News is all around us but sometimes we might miss some important news or event o
 
 To achieve this task we have used Kafka, spark and mongodb database. We are fetching the news headlines from newsapi,websearch API and also from inshorts. We use Kafka to act as mediator for storing temporarily before we apply any processing on data. The data stored is then fetched using Apache Spark for processing. Finally the results are stored in a MongoDB database.
 
+![WhatsApp Image 2021-06-06 at 13 03 03](https://user-images.githubusercontent.com/64249206/121565962-a29c5380-ca3a-11eb-806a-e0fc40a5d454.jpeg)
+
+
 ## Requirements
 
-### Kafka installed ( version =  2.13-2.70)
+### 1.Kafka installed ( version =  2.13-2.70)
 - kafka (python api)
 - kafka-python 
 
-### Apache Spark installed (version = version 3.1.0)
+### 2.Apache Spark installed (version = version 3.1.0)
 - findspark
 - pyspark
 - spark nlp
 
-### newsapi
+### 3.newsapi
 - newsapi-python
 
-### inshorts
+### 4.inshorts
 - beautifulsoup4
 - lxml
 
-### Twitter developer account to get API keys and access tokens
+### 5.Twitter developer account to get API keys and access tokens
 
-### API Keys for Web Search API
+### 6.API Keys for Web Search API
 
-### MongoDB account, to make a cluster with database and collection
+### 7.MongoDB account, to make a cluster with database and collection
 
 ## Steps to Run-
 
@@ -62,4 +65,4 @@ spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.1,com.joh
 ```console
 python3 twitter.py
 ```
-
+<hr>
